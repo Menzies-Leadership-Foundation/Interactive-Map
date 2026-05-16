@@ -54,10 +54,10 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:'DM San
 .lgd-i{display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:11px;color:rgba(255,255,255,.6)}
 .lgd-s{width:12px;height:12px;border-radius:50%;flex-shrink:0}
 .lgd-s.sq{border-radius:2px}
-.zc{position:absolute;top:12px;right:16px;z-index:50;display:flex;flex-direction:column;gap:4px}
+.zc{position:absolute;top:12px;right:16px;z-index:50;display:flex;flex-direction:row;gap:4px}
 .zb{width:28px;height:28px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:3px;color:white;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;font-family:monospace;line-height:1;position:relative}
 .zb:hover{background:rgba(200,150,62,.2);border-color:var(--gold)}
-.zb[data-tip]::after{content:attr(data-tip);position:absolute;right:34px;top:50%;transform:translateY(-50%);background:var(--navy2);border:1px solid rgba(200,150,62,.3);color:rgba(255,255,255,.9);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:400;white-space:nowrap;padding:4px 9px;border-radius:4px;pointer-events:none;opacity:0;transition:opacity 0s}
+.zb[data-tip]::after{content:attr(data-tip);position:absolute;top:34px;left:50%;transform:translateX(-50%);background:var(--navy2);border:1px solid rgba(200,150,62,.3);color:rgba(255,255,255,.9);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:400;white-space:nowrap;padding:4px 9px;border-radius:4px;pointer-events:none;opacity:0;transition:opacity 0s}
 .zb[data-tip]:hover::after{opacity:1;transition:opacity 0s}
 #tour{position:fixed;z-index:9000;max-width:280px;background:var(--cream);border:1px solid rgba(200,150,62,.4);border-radius:8px;padding:16px 18px;box-shadow:0 6px 28px rgba(0,0,0,.35);display:none}
 #tour.vis{display:block}
@@ -82,7 +82,7 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:'DM San
 #net-svg{width:100%;height:100%;display:block}
 /* TOOLTIP */
 #tt{position:fixed;z-index:9999;max-width:340px;min-width:220px;background:var(--navy2);border:1px solid rgba(200,150,62,.3);border-radius:6px;padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,.5);opacity:0;transition:opacity .15s;pointer-events:none;max-height:75vh;overflow-y:auto}
-.map-panel{position:absolute;top:56px;right:0;bottom:0;width:280px;background:rgba(247,243,237,0.97);border-left:1px solid rgba(200,150,62,.25);display:flex;flex-direction:column;z-index:20;transform:translateX(100%);transition:transform .25s ease;pointer-events:none}
+.map-panel{position:absolute;top:120px;right:0;bottom:0;width:280px;background:rgba(247,243,237,0.97);border-left:1px solid rgba(200,150,62,.25);border-top:1px solid rgba(200,150,62,.25);display:flex;flex-direction:column;z-index:20;transform:translateX(100%);transition:transform .25s ease;pointer-events:none}
 .map-panel.vis{transform:translateX(0);pointer-events:all}
 .map-panel-inner{flex:1;overflow-y:auto;padding:16px 16px 12px}
 .map-panel-close{position:absolute;top:10px;right:10px;background:transparent;border:none;cursor:pointer;font-size:16px;color:var(--textd);line-height:1;padding:2px 6px;border-radius:3px}
@@ -112,8 +112,13 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:'DM San
 #tt .tchips{display:flex;flex-wrap:wrap;gap:4px}
 #tt .tchip{font-size:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:3px;padding:3px 7px;color:rgba(255,255,255,.75);line-height:1.4;cursor:pointer;transition:background .15s,border-color .15s}
 #tt .tchip:hover{background:rgba(200,150,62,.2);border-color:rgba(200,150,62,.5)}
-@keyframes pulseSelected{0%{filter:drop-shadow(0 0 0 rgba(255,235,180,0))}40%{filter:drop-shadow(0 0 32px rgba(255,235,180,1)) drop-shadow(0 0 14px rgba(255,235,180,1))}100%{filter:drop-shadow(0 0 0 rgba(255,235,180,0))}}
+@keyframes pulseSelected{0%{filter:drop-shadow(0 0 0 rgba(247,240,225,0))}40%{filter:drop-shadow(0 0 32px rgba(247,240,225,1)) drop-shadow(0 0 14px rgba(247,240,225,1))}100%{filter:drop-shadow(0 0 0 rgba(247,240,225,0))}}
 .pulse-sel{animation:pulseSelected 1.4s ease-in-out 1}
+#slide5 .fb,#slide5 .cfb{font-size:10px;padding:4px 11px;letter-spacing:.07em}
+#slide5 .cfb{white-space:normal;line-height:1.15;text-align:center}
+.zc-panel{background:rgba(10,22,40,.55);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:6px 12px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;align-self:center}
+.zc-t{font-size:9px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.zc-row{display:flex;flex-direction:row;gap:4px}
 </style>
 </head>
 <body>
@@ -135,24 +140,34 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:'DM San
    <li><b>Outputs</b> of our and partners' collective endeavours</li></ul></div>
   </div></div>
   <div class="slide" id="slide4">
-   <div class="mhdr" style="flex-direction:column;align-items:flex-start;gap:5px;padding:6px 16px;">
-    <div style="display:flex;align-items:center;gap:8px;">
-     <div class="fbg" id="loi-filters">
-      <button class="fb active" data-show="all">All</button>
-      <button class="fb" data-show="Level of Leadership">Lines of Inquiry</button>
-      <button class="fb" data-show="Initiative">Initiatives</button>
-      <button class="fb" data-show="Partner">Partners</button>
+   <div class="mhdr" style="align-items:flex-start;gap:16px;padding:6px 16px;">
+    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:5px;flex:1;min-width:0;">
+     <div style="display:flex;align-items:center;gap:8px;">
+      <div class="fbg" id="loi-filters">
+       <button class="fb active" data-show="all">All</button>
+       <button class="fb" data-show="Level of Leadership">Lines of Inquiry</button>
+       <button class="fb" data-show="Initiative">Initiatives</button>
+       <button class="fb" data-show="Partner">Partners</button>
+      </div>
+     </div>
+     <div style="display:flex;align-items:center;gap:8px;">
+      <div class="fbg" id="loi-year-filters">
+       <button class="fb active" data-loiyear="all">All years</button>
+       <button class="fb" data-loiyear="pre2022">Pre 2022</button>
+       <button class="fb" data-loiyear="2022">2022</button>
+       <button class="fb" data-loiyear="2023">2023</button>
+       <button class="fb" data-loiyear="2024">2024</button>
+       <button class="fb" data-loiyear="2025">2025</button>
+       <button class="fb" data-loiyear="2026">2026</button>
+      </div>
      </div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;">
-     <div class="fbg" id="loi-year-filters">
-      <button class="fb active" data-loiyear="all">All years</button>
-      <button class="fb" data-loiyear="pre2022">Pre 2022</button>
-      <button class="fb" data-loiyear="2022">2022</button>
-      <button class="fb" data-loiyear="2023">2023</button>
-      <button class="fb" data-loiyear="2024">2024</button>
-      <button class="fb" data-loiyear="2025">2025</button>
-      <button class="fb" data-loiyear="2026">2026</button>
+    <div class="zc-panel">
+     <div class="zc-t">Zoom</div>
+     <div class="zc-row">
+      <button class="zb" id="loi-zi" data-tip="Zoom in">+</button>
+      <button class="zb" id="loi-zo" data-tip="Zoom out">−</button>
+      <button class="zb" id="loi-zf" style="font-size:11px;" data-tip="Reset view">⊡</button>
      </div>
     </div>
    </div>
@@ -180,44 +195,50 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:'DM San
      <div class="lgd-i"><span class="lgd-s sq" style="background:var(--ct);"></span> Technology leadership</div>
      <div class="lgd-i"><span class="lgd-s sq" style="background:var(--ca);"></span> Insight &amp; influence</div>
     </div>
-    <div class="zc"><button class="zb" id="loi-zi" data-tip="Zoom in">+</button><button class="zb" id="loi-zo" data-tip="Zoom out">−</button><button class="zb" id="loi-zf" style="font-size:11px;" data-tip="Reset view">⊡</button></div>
    </div>
   </div>
   <div class="slide" id="slide5">
-   <div class="mhdr" style="flex-direction:column;align-items:flex-start;gap:5px;padding:6px 16px;">
-    <div style="display:flex;align-items:center;gap:8px;">
-     
-     <div class="fbg">
-      <button class="fb active" data-type="all">All components</button>
-      <button class="fb" data-type="Cohort">Cohorts</button>
-      <button class="fb" data-type="Lever">Levers</button>
-      <button class="fb" data-type="Initiative">Initiatives</button>
-      <button class="fb" data-type="Output">Outputs</button>
-      <button class="fb" data-type="Partner">Partners</button>
+   <div class="mhdr" style="align-items:flex-start;gap:16px;padding:6px 16px;">
+    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:5px;flex:1;min-width:0;">
+     <div style="display:flex;align-items:center;gap:8px;">
+      <div class="fbg">
+       <button class="fb active" data-type="all">All components</button>
+       <button class="fb" data-type="Cohort">Cohorts</button>
+       <button class="fb" data-type="Lever">Levers</button>
+       <button class="fb" data-type="Initiative">Initiatives</button>
+       <button class="fb" data-type="Output">Outputs</button>
+       <button class="fb" data-type="Partner">Partners</button>
+      </div>
+     </div>
+     <div style="display:flex;align-items:center;gap:8px;">
+      <div class="fbg" id="cat-filters">
+       <button class="cfb active" data-cat="all">All<br>categories</button>
+       <button class="cfb" data-cat="Community resilience">Community<br>resilience</button>
+       <button class="cfb" data-cat="Indigenous self-determination">Indigenous<br>Self-determination</button>
+       <button class="cfb" data-cat="Education outcomes">Education<br>outcomes</button>
+       <button class="cfb" data-cat="Youth development">Youth<br>development</button>
+       <button class="cfb" data-cat="Technology leadership">Technology<br>leadership</button>
+       <button class="cfb" data-cat="Insight and influence">Insight<br>&amp; influence</button>
+      </div>
+     </div>
+     <div style="display:flex;align-items:center;gap:8px;">
+      <div class="fbg" id="year-filters">
+       <button class="fb active" data-year="all">All years</button>
+       <button class="fb" data-year="pre2022">Pre 2022</button>
+       <button class="fb" data-year="2022">2022</button>
+       <button class="fb" data-year="2023">2023</button>
+       <button class="fb" data-year="2024">2024</button>
+       <button class="fb" data-year="2025">2025</button>
+       <button class="fb" data-year="2026">2026</button>
+      </div>
      </div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;">
-     
-     <div class="fbg" id="cat-filters">
-      <button class="cfb active" data-cat="all">All categories</button>
-      <button class="cfb" data-cat="Community resilience">Community resilience</button>
-      <button class="cfb" data-cat="Indigenous self-determination">Indigenous self-det.</button>
-      <button class="cfb" data-cat="Education outcomes">Education outcomes</button>
-      <button class="cfb" data-cat="Youth development">Youth development</button>
-      <button class="cfb" data-cat="Technology leadership">Technology leadership</button>
-      <button class="cfb" data-cat="Insight and influence">Insight &amp; influence</button>
-     </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;">
-     
-     <div class="fbg" id="year-filters">
-      <button class="fb active" data-year="all">All years</button>
-      <button class="fb" data-year="pre2022">Pre 2022</button>
-      <button class="fb" data-year="2022">2022</button>
-      <button class="fb" data-year="2023">2023</button>
-      <button class="fb" data-year="2024">2024</button>
-      <button class="fb" data-year="2025">2025</button>
-      <button class="fb" data-year="2026">2026</button>
+    <div class="zc-panel">
+     <div class="zc-t">Zoom</div>
+     <div class="zc-row">
+      <button class="zb" id="net-zi" data-tip="Zoom in">+</button>
+      <button class="zb" id="net-zo" data-tip="Zoom out">−</button>
+      <button class="zb" id="net-zf" style="font-size:11px;" data-tip="Reset view">⊡</button>
      </div>
     </div>
    </div>
@@ -234,7 +255,7 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:'DM San
     <div id="net-hypothesis" style="position:absolute;top:16px;left:18px;width:280px;background:rgba(247,243,237,0.97);border:1px solid rgba(200,150,62,.3);border-radius:6px;padding:16px 18px;box-shadow:0 4px 20px rgba(0,0,0,.25);z-index:5;pointer-events:none;">
      <div class="mp-type">Our strategy</div>
      <div class="mp-title">Creating a future-fit Australia</div>
-     <div class="mp-body">Our portfolio of partnerships, initiatives and outputs aims to activate systemic levers and strengthen future-fit leadership capability for multiple cohorts of Australians.</div>
+     <div class="mp-body">Our portfolio of partnerships, initiatives and outputs aims to activate systemic levers, and strengthen future-fit leadership capability for multiple cohorts of Australians.</div>
     </div>
     <div class="lgd">
      <div class="lgd-t">Legend</div>
@@ -245,16 +266,15 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:'DM San
      <div class="lgd-i"><span class="lgd-s" style="background:var(--ct);"></span> Technology leadership</div>
      <div class="lgd-i"><span class="lgd-s" style="background:var(--ca);"></span> Insight &amp; influence</div>
     </div>
-    <div class="zc"><button class="zb" id="net-zi" data-tip="Zoom in">+</button><button class="zb" id="net-zo" data-tip="Zoom out">−</button><button class="zb" id="net-zf" style="font-size:11px;" data-tip="Reset view">⊡</button></div>
    </div>
   </div>
   <div class="slide ts" id="slide6"><div class="ti">
    <div class="ey">Further reading</div><h1 class="h1">Learn more</h1><div class="dv"></div>
-   <div class="bd"><p>To learn more about future-fit leadership visit the <a href="https://menziesfoundation.org.au" target="_blank">Menzies Leadership Foundation</a>.</p>
-   <p>The Menzies Leadership Foundation works at the intersection of practice, policy and culture through three priorities:</p>
+   <div class="bd"><p>The <a href="https://menziesfoundation.org.au" target="_blank">Menzies Leadership Foundation</a> works at the intersection of practice, research and culture through three priorities:</p>
    <ul><li><b>Innovation</b> — Catalysing partnerships that build leadership capability.</li>
    <li><b>Insights</b> — Synthesising research and data to advance the field of leadership in complexity.</li>
-   <li><b>Influence</b> — Elevating public narratives on leadership, integrity and collective responsibility.</li></ul></div>
+   <li><b>Influence</b> — Elevating public narratives on leadership, integrity and collective responsibility.</li></ul>
+   <p>Learn more about future-fit leadership on our website <a href="https://menziesfoundation.org.au" target="_blank">here</a>.</p></div>
    <div class="wm">Last updated April 2026</div>
   </div></div>
  </div>
@@ -584,10 +604,12 @@ function goTo(idx){
     setActivePanel('loi-panel');
     if(!loiBuilt)requestAnimationFrame(()=>requestAnimationFrame(buildLOI));
     else if(typeof applyLOIFilter==='function')applyLOIFilter(); // reapply 'All' filter on revisit
+    if(loiBuilt&&loiDefaultTF){loiTF={...loiDefaultTF};const lg=document.getElementById('loi-g');if(lg)applyLTF(lg);}
   } else if(idx===3){
     setActivePanel('net-panel');
     if(!netBuilt)requestAnimationFrame(()=>requestAnimationFrame(buildNet));
     else if(typeof applyFilters==='function')applyFilters();
+    if(netBuilt&&netDefaultTF){netTF={...netDefaultTF};const ng=document.getElementById('net-g');if(ng)applyNTF(ng);}
   } else {
     activePanel=null;
   }
@@ -606,6 +628,8 @@ let applyFiltersFn=null,applyLOIFilterFn=null;
 let loiFitFn=null,netFitFn=null;
 function loiReset(){if(loiResetFn)loiResetFn();}
 function netReset(){if(netResetFn)netResetFn();}
+function loiFit(label){if(loiFitFn)loiFitFn(label);}
+function netFit(label){if(netFitFn)netFitFn(label);}
 function applyFilters(){if(applyFiltersFn)applyFiltersFn();}
 function applyLOIFilter(){if(applyLOIFilterFn)applyLOIFilterFn();}
 let hoverTimer=null;
@@ -614,9 +638,9 @@ function startHoverTT(label,e){
   hoverTimer=setTimeout(()=>showTT(label,e.clientX,e.clientY),600);
 }
 function clearHoverTT(){clearTimeout(hoverTimer);}
-function navTo(label){if(!ELEMENTS[label])return;hideTT();if(cur===2&&loiClickFn)loiClickFn(label);else if(cur===3&&netClickFn)netClickFn(label);}
+function navTo(label){if(!ELEMENTS[label])return;if(cur===2&&loiClickFn){loiClickFn(label);loiFit(label);}else if(cur===3&&netClickFn){netClickFn(label);netFit(label);}}
 tt.addEventListener('click',e=>{const t=e.target.closest('[data-nav]');if(t){e.stopPropagation();navTo(t.dataset.nav);}});
-document.addEventListener('click',e=>{const t=e.target.closest('[data-nav]');if(t&&activePanel){e.stopPropagation();navTo(t.dataset.nav);}});
+document.addEventListener('click',e=>{const t=e.target.closest('[data-nav]');if(t&&activePanel){e.stopImmediatePropagation();navTo(t.dataset.nav);}});
 function buildLists(label){
   const el=ELEMENTS[label];if(!el)return'';
   const type=el.type,secs=[];
@@ -631,6 +655,10 @@ function buildLists(label){
   if(type==='Partner'){
     const i=CONNECTIONS.filter(c=>c.type==='Partner'&&c.from===label&&ELEMENTS[c.to]).map(c=>c.to);
     if(i.length)secs.push({t:'Initiatives involved in',items:i});
+  }
+  if(type==='Output'){
+    const i=CONNECTIONS.filter(c=>c.type==='Output'&&c.from===label&&ELEMENTS[c.to]).map(c=>c.to);
+    if(i.length)secs.push({t:'Associated initiatives',items:i});
   }
   if(type==='Lever'||type==='Level of Leadership'){
     const i=CONNECTIONS.filter(c=>c.type==='Level of Leadership'&&c.to===label&&ELEMENTS[c.from]).map(c=>c.from);
@@ -701,7 +729,7 @@ function hideTT(){
   if(activePanel)activePanel.classList.remove('vis');
 }
 document.addEventListener('click',e=>{
-  if(!e.target.closest('#tt')&&!e.target.closest('.map-panel')&&!e.target.closest('[data-label]'))hideTT();
+  if(!e.target.closest('#tt')&&!e.target.closest('.map-panel')&&!e.target.closest('[data-label]')&&!e.target.closest('[data-nav]'))hideTT();
 });
 
 function svgEl(t,a){const e=document.createElementNS('http://www.w3.org/2000/svg',t);for(const[k,v]of Object.entries(a||{}))e.setAttribute(k,v);return e;}
@@ -720,10 +748,25 @@ function setupPZ(container,svg,g,tf,apply){
   container.addEventListener('touchend',()=>{drag=false;ltd=null;});
 }
 
+function tweenTF(tf,applyFn,tX,tY,tS,dur){
+  dur=dur||450;
+  const sx=tf.x,sy=tf.y,ss=tf.scale,t0=performance.now();
+  function step(t){
+    const p=Math.min(1,(t-t0)/dur);
+    const e=1-Math.pow(1-p,3);
+    tf.x=sx+(tX-sx)*e;
+    tf.y=sy+(tY-sy)*e;
+    tf.scale=ss+(tS-ss)*e;
+    applyFn();
+    if(p<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
 // ════════════════════════════════════════
 // SLIDE 4: LOI MAP
 // ════════════════════════════════════════
-let loiBuilt=false;let loiTF={x:0,y:0,scale:1};
+let loiBuilt=false;let loiTF={x:0,y:0,scale:1};let loiDefaultTF=null;
 let loiActiveShow='all',loiActiveYear='all';
 function applyLTF(g){g.setAttribute('transform','translate('+loiTF.x+','+loiTF.y+') scale('+loiTF.scale+')');}
 function buildLOI(){
@@ -827,6 +870,7 @@ function buildLOI(){
   const tx=W/2-contentCx*scl;
   const ty=20;
   loiTF={x:tx, y:ty, scale:scl};
+  loiDefaultTF={x:tx, y:ty, scale:scl};
   const defs=svgEl('defs');
   const mk=svgEl('marker',{id:'la',markerWidth:'8',markerHeight:'8',refX:'6',refY:'3',orient:'auto'});
   mk.appendChild(svgEl('path',{d:'M0,0 L0,6 L8,3 z',fill:'rgba(255,255,255,0.25)'}));defs.appendChild(mk);svg.appendChild(defs);
@@ -865,16 +909,26 @@ function buildLOI(){
 
   let loiSel=null;
   function loiClick(label){
-    if(!nodes[label]){hideTT();return;}
-    if(loiSel===label){loiSel=null;loiReset();hideTT();return;}
+    if(!ELEMENTS[label]){hideTT();return;}
+    // Toggle off only when clicking the same node that's currently selected
+    // AND it's still present on the map. (Chip-clicks that re-target the same
+    // label still need to refresh the panel, so we let those fall through.)
+    if(loiSel===label&&nodes[label]){loiSel=null;loiReset();hideTT();return;}
     loiSel=label;loiReset();
+    // Always update the right-hand panel first, regardless of whether the
+    // element is drawn on this map (chips can reference off-map elements).
+    if(nodes[label]){
+      const n=nodes[label],rect=canvas.getBoundingClientRect();
+      const sx=rect.left+(n.x+(n.w||0)/2)*loiTF.scale+loiTF.x;
+      const sy=rect.top+(n.y+(n.h||0)/2)*loiTF.scale+loiTF.y;
+      showTT(label,sx,sy);
+    } else {
+      showTT(label,window.innerWidth*.5,window.innerHeight*.4);
+      return; // nothing more to highlight on this map
+    }
     const _esc=(window.CSS&&CSS.escape)?CSS.escape(label):label.replace(/"/g,'\\"');
     const _selNode=g.querySelector('[data-label="'+_esc+'"]');
     if(_selNode){_selNode.classList.remove('pulse-sel');void _selNode.getBoundingClientRect();_selNode.classList.add('pulse-sel');setTimeout(()=>_selNode.classList.remove('pulse-sel'),1800);}
-    const n=nodes[label],rect=canvas.getBoundingClientRect();
-    const sx=rect.left+(n.x+(n.w||0)/2)*loiTF.scale+loiTF.x;
-    const sy=rect.top+(n.y+(n.h||0)/2)*loiTF.scale+loiTF.y;
-    showTT(label,sx,sy);
     const conn=new Set([label]);
     // First hop: direct connections
     CONNECTIONS.forEach(c=>{if(nodes[c.from]&&nodes[c.to]&&(c.from===label||c.to===label)){conn.add(c.from);conn.add(c.to);}});
@@ -930,7 +984,7 @@ function buildLOI(){
   loiClickFn=loiClick;
   applyLOIFilterFn=()=>{g.querySelectorAll('.ln').forEach(n=>n.style.opacity='1');};
   document.getElementById('loi-panel-close').onclick=()=>{loiSel=null;loiReset();hideTT();};
-  canvas.addEventListener('click',e=>{if(!e.target.closest('[data-label]')){loiSel=null;loiReset();hideTT();}});
+  canvas.addEventListener('click',e=>{if(e.target.closest('[data-nav]'))return;if(!e.target.closest('[data-label]')){loiSel=null;loiReset();hideTT();}});
 
   function drawBox(key,opts){const n=nodes[key];if(!n)return;const el=ELEMENTS[key];if(!el)return;
     const grp=svgEl('g',{class:'ln','data-label':key,style:'cursor:pointer'});
@@ -956,23 +1010,7 @@ function buildLOI(){
   allInits.forEach(k=>{const cat=ELEMENTS[k]?.category||'';drawBox(k,{fill:CC[cat]||'#555',stroke:'rgba(255,255,255,.2)',sw:'1',fs:'9',rx:2});});
   allPartners.forEach(p=>{const n=nodes[p];if(!n)return;
     const grp=svgEl('g',{class:'ln','data-label':p,style:'cursor:pointer'});
-    const connInit=CONNECTIONS.find(c=>c.type==='Partner'&&c.from===p&&nodes[c.to]);
-    const accentCols=connInit
-      ? [...new Set(CONNECTIONS.filter(c=>c.type==='Partner'&&c.from===p&&nodes[c.to]).map(c=>CC[ELEMENTS[c.to]?.category||'']||'rgba(255,255,255,.2)'))]
-      : ['rgba(255,255,255,.2)'];
-    const chipH=20,padL=9,padR=7;
-    const tMeasure=svgEl('text',{x:'0',y:'0',fill:'none','font-size':'9','font-family':'DM Sans,sans-serif'});tMeasure.textContent=p;
-    g.appendChild(tMeasure);const tw=tMeasure.getComputedTextLength()||p.length*5.2;g.removeChild(tMeasure);
-    const chipW=padL+tw+padR;
-    const x0=n.x;
-    grp.appendChild(svgEl('rect',{x:x0,y:n.y-chipH/2,width:chipW,height:chipH,rx:'3',fill:'transparent'}));
-    const bg=svgEl('rect',{x:x0,y:n.y-chipH/2,width:chipW,height:chipH,rx:'3',fill:'rgba(255,255,255,.06)',stroke:'rgba(255,255,255,.18)','stroke-width':'0.8'});
-    const t=svgEl('text',{x:x0+padL,y:n.y+4,fill:'rgba(255,255,255,.75)','font-size':'9','font-family':'DM Sans,sans-serif',style:'pointer-events:none'});t.textContent=p;
-    grp.appendChild(bg);
-    drawAccentBar(grp,x0,n.y-chipH/2,chipH,accentCols);
-    grp.appendChild(t);
-    grp.addEventListener('mouseenter',e=>{bg.setAttribute('fill','rgba(255,255,255,.12)');bg.setAttribute('stroke','rgba(255,255,255,.4)');t.setAttribute('fill','rgba(255,255,255,.95)');startHoverTT(p,e);});
-    grp.addEventListener('mouseleave',()=>{bg.setAttribute('fill','rgba(255,255,255,.06)');bg.setAttribute('stroke','rgba(255,255,255,.18)');t.setAttribute('fill','rgba(255,255,255,.75)');clearHoverTT();});
+    drawPartnerChip(grp, g, p, n.x, n.y, {wrap:false});
     grp.addEventListener('click',e=>{e.stopPropagation();loiClick(p);});
     g.appendChild(grp);});
 
@@ -1044,6 +1082,47 @@ function buildLOI(){
     applyLOIFilters();
   };});
   applyLOIFilterFn=applyLOIFilters;
+  loiFitFn=function(label){
+    const n=nodes[label];if(!n)return;
+    // Build connected set — mirror loiClick semantics (1-hop, +2-hop LOI when Partner)
+    const conn=new Set([label]);
+    CONNECTIONS.forEach(c=>{if(nodes[c.from]&&nodes[c.to]&&(c.from===label||c.to===label)){conn.add(c.from);conn.add(c.to);}});
+    if(ELEMENTS[label]?.type==='Partner'){
+      const inits=[...conn].filter(l=>ELEMENTS[l]?.type==='Initiative');
+      inits.forEach(init=>{
+        CONNECTIONS.forEach(c=>{
+          if((c.from===init||c.to===init)&&nodes[c.from]&&nodes[c.to]){
+            const other=c.from===init?c.to:c.from;
+            if(ELEMENTS[other]?.type==='Level of Leadership')conn.add(other);
+          }
+        });
+      });
+    }
+    // Bbox in SVG coords
+    let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+    conn.forEach(l=>{
+      const nn=nodes[l];if(!nn)return;
+      const w=nn.w||0,h=nn.h||0;
+      if(minX>nn.x-w/2)minX=nn.x-w/2;
+      if(maxX<nn.x+w/2)maxX=nn.x+w/2;
+      if(minY>nn.y-h/2)minY=nn.y-h/2;
+      if(maxY<nn.y+h/2)maxY=nn.y+h/2;
+    });
+    if(!isFinite(minX))return;
+    const bw=Math.max(1,maxX-minX),bh=Math.max(1,maxY-minY);
+    const bcx=(minX+maxX)/2,bcy=(minY+maxY)/2;
+    // Screen-space safe area: clear of LHS card (left:18,w:280), legend (bottom-left),
+    // and RHS panel (280px when open)
+    const W=canvas.clientWidth,H=canvas.clientHeight;
+    const panelOpen=activePanel&&activePanel.classList.contains('vis');
+    const sLeft=310, sRight=panelOpen?W-290:W-20, sTop=24, sBottom=H-24;
+    const sw=Math.max(80,sRight-sLeft), sh=Math.max(80,sBottom-sTop);
+    let sc=Math.min(sw/bw, sh/bh)*0.9;
+    sc=Math.max(0.1,Math.min(5,sc));
+    const scx=sLeft+sw/2, scy=sTop+sh/2;
+    const tX=scx-bcx*sc, tY=scy-bcy*sc;
+    tweenTF(loiTF,()=>applyLTF(g),tX,tY,sc);
+  };
   setupPZ(canvas,svg,g,loiTF,()=>applyLTF(g));
   document.getElementById('loi-zi').onclick=()=>{loiTF.scale=Math.min(loiTF.scale*1.2,4);applyLTF(g);};
   document.getElementById('loi-zo').onclick=()=>{loiTF.scale=Math.max(loiTF.scale/1.2,.2);applyLTF(g);};
@@ -1074,10 +1153,73 @@ function drawAccentBar(svgGroup,x0,y0,chipH,colors){
     svgGroup.appendChild(seg);
   });
 }
+// Shared partner-chip renderer used by both maps. Attaches chip contents to
+// the provided grp, measuring text via parentG. Set opts.wrap=true to allow
+// two-line wrapping when text exceeds opts.maxChipW (default 160).
+function drawPartnerChip(grp, parentG, label, anchorX, anchorY, opts){
+  opts = opts || {};
+  const wrap     = !!opts.wrap;
+  const maxChipW = opts.maxChipW || 160;
+  const accentCols = partnerColors(label);
+  const padL=9, padR=7, lineH=11, fontSize='9';
+  const tMeasure = svgEl('text',{'font-size':fontSize,'font-family':'DM Sans,sans-serif'});
+  tMeasure.textContent = label;
+  parentG.appendChild(tMeasure);
+  const fullTW = tMeasure.getComputedTextLength() || label.length*5.2;
+  parentG.removeChild(tMeasure);
+  let lines = [label];
+  if(wrap && padL+fullTW+padR > maxChipW){
+    const words = label.split(' ');
+    let l1='', l2='';
+    for(let i=0; i<words.length-1; i++){
+      const cand = words.slice(0,i+1).join(' ');
+      const rest = words.slice(i+1).join(' ');
+      if(cand.length/(cand.length+rest.length) >= 0.45){l1=cand; l2=rest; break;}
+    }
+    if(!l1){l1=words.slice(0,Math.ceil(words.length/2)).join(' '); l2=words.slice(Math.ceil(words.length/2)).join(' ');}
+    lines = [l1, l2];
+  }
+  let chipW;
+  if(lines.length === 1){
+    chipW = padL + fullTW + padR;
+  } else {
+    const tm2 = svgEl('text',{'font-size':fontSize,'font-family':'DM Sans,sans-serif'});
+    parentG.appendChild(tm2);
+    chipW = Math.min(maxChipW, padL + Math.max(...lines.map(l => {tm2.textContent=l; return tm2.getComputedTextLength()||l.length*5.2;})) + padR);
+    parentG.removeChild(tm2);
+  }
+  const chipH = lines.length > 1 ? 24 : 20;
+  const x0 = anchorX;
+  const y0 = anchorY - chipH/2;
+  grp.appendChild(svgEl('rect',{x:x0, y:y0, width:chipW, height:chipH, rx:'3', fill:'transparent'}));
+  const bg = svgEl('rect',{x:x0, y:y0, width:chipW, height:chipH, rx:'3', fill:'rgba(255,255,255,.06)', stroke:'rgba(255,255,255,.18)', 'stroke-width':'0.8'});
+  grp.appendChild(bg);
+  drawAccentBar(grp, x0, y0, chipH, accentCols);
+  const totalTH = lines.length * lineH;
+  const textNodes = [];
+  lines.forEach((l,li) => {
+    const t = svgEl('text',{x:x0+padL, y:anchorY-totalTH/2+li*lineH+lineH*0.85, fill:'rgba(255,255,255,.75)', 'font-size':fontSize, 'font-family':'DM Sans,sans-serif', style:'pointer-events:none'});
+    t.textContent = l;
+    grp.appendChild(t);
+    textNodes.push(t);
+  });
+  grp.addEventListener('mouseenter', e => {
+    bg.setAttribute('fill','rgba(255,255,255,.12)');
+    bg.setAttribute('stroke','rgba(255,255,255,.4)');
+    textNodes.forEach(t => t.setAttribute('fill','rgba(255,255,255,.95)'));
+    startHoverTT(label, e);
+  });
+  grp.addEventListener('mouseleave', () => {
+    bg.setAttribute('fill','rgba(255,255,255,.06)');
+    bg.setAttribute('stroke','rgba(255,255,255,.18)');
+    textNodes.forEach(t => t.setAttribute('fill','rgba(255,255,255,.75)'));
+    clearHoverTT();
+  });
+}
 
 // ════════════════════════════════════════
 // ════════════════════════════════════════
-let netBuilt=false;let netTF={x:0,y:0,scale:1};
+let netBuilt=false;let netTF={x:0,y:0,scale:1};let netDefaultTF=null;
 let netActiveType='all',netActiveCat='all',netActiveYear='all';
 function applyNTF(g){g.setAttribute('transform','translate('+netTF.x+','+netTF.y+') scale('+netTF.scale+')');}
 
@@ -1353,6 +1495,7 @@ function buildNet(){
   const sc=Math.min(1,W/(maxX-minX),H/(maxY-minY))*.9;
   const tx=(W-(maxX-minX)*sc)/2-minX*sc,ty=(H-(maxY-minY)*sc)/2-minY*sc;
   netTF={x:tx,y:ty,scale:sc};
+  netDefaultTF={x:tx,y:ty,scale:sc};
 
   const defs=svgEl('defs');
   const mk=svgEl('marker',{id:'na',markerWidth:'6',markerHeight:'6',refX:'5',refY:'3',orient:'auto'});
@@ -1412,7 +1555,8 @@ function buildNet(){
 
   let netSel=null;
   function netClick(label){
-    if(netSel===label){netSel=null;netReset();hideTT();return;}
+    if(!ELEMENTS[label]){hideTT();return;}
+    if(netSel===label&&pos[label]){netSel=null;netReset();hideTT();return;}
     netSel=label;netReset();
     const _esc=(window.CSS&&CSS.escape)?CSS.escape(label):label.replace(/"/g,'\\"');
     const _selNode=nodeG.querySelector('[data-label="'+_esc+'"]');
@@ -1455,6 +1599,7 @@ function buildNet(){
     });
     const permanent=new Set(['FUTURE-FIT LEADERSHIP','Cohorts and levers','Initiatives and outputs']);
     nodeG.querySelectorAll('g').forEach(n=>n.style.opacity=(conn.has(n.dataset.label)||permanent.has(n.dataset.label))?'1':'0.07');
+    if(netFitFn)netFitFn(label);
   }
   netResetFn=function(){
     edgeG.querySelectorAll('path').forEach(l=>{
@@ -1472,6 +1617,72 @@ function buildNet(){
     applyFilters();
   };
   netClickFn=netClick;
+  netFitFn=function(label){
+    const p=pos[label];if(!p)return;
+    // Build connected set — mirror netClick semantics (1-hop, +2-hop Lever when Partner)
+    const conn=new Set([label]);
+    CONNECTIONS.forEach(c=>{if(pos[c.from]&&pos[c.to]&&(c.from===label||c.to===label)){conn.add(c.from);conn.add(c.to);}});
+    if(ELEMENTS[label]?.type==='Partner'){
+      const inits=[...conn].filter(l=>ELEMENTS[l]?.type==='Initiative');
+      inits.forEach(init=>{
+        CONNECTIONS.forEach(c=>{
+          if((c.from===init||c.to===init)&&pos[c.from]&&pos[c.to]){
+            const other=c.from===init?c.to:c.from;
+            if(ELEMENTS[other]?.type==='Lever')conn.add(other);
+          }
+        });
+      });
+    }
+    // Per-type half-extent for bbox
+    function halfExt(l){
+      const el=ELEMENTS[l];if(!el)return 10;
+      const t=el.type;
+      if(t==='Cohort')return 36+((el.size||8)-8)*8;
+      if(t==='Lever')return 18;
+      if(t==='Initiative')return 14;
+      if(t==='Output')return 10;
+      if(t==='Partner')return 50;
+      if(t==='Context')return l==='FUTURE-FIT LEADERSHIP'?70:50;
+      return 12;
+    }
+    // Respect current filter visibility — don't expand bbox to hidden nodes
+    const yearSet=(typeof computeYearVisibleSet==='function')?computeYearVisibleSet():null;
+    function isVis(l){
+      if(typeof nodeVisible==='function')return nodeVisible(l,yearSet);
+      return true;
+    }
+    let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+    conn.forEach(l=>{
+      const pp=pos[l];if(!pp)return;
+      if(!isVis(l)&&l!==label)return;
+      const r=halfExt(l);
+      if(minX>pp.x-r)minX=pp.x-r;
+      if(maxX<pp.x+r)maxX=pp.x+r;
+      if(minY>pp.y-r)minY=pp.y-r;
+      if(maxY<pp.y+r)maxY=pp.y+r;
+    });
+    if(!isFinite(minX))return;
+    // Always include FUTURE-FIT LEADERSHIP in the view so zoom never goes too tight
+    const fflP=pos['FUTURE-FIT LEADERSHIP'];
+    if(fflP){
+      const r=70;
+      if(minX>fflP.x-r)minX=fflP.x-r;
+      if(maxX<fflP.x+r)maxX=fflP.x+r;
+      if(minY>fflP.y-r)minY=fflP.y-r;
+      if(maxY<fflP.y+r)maxY=fflP.y+r;
+    }
+    const bw=Math.max(1,maxX-minX),bh=Math.max(1,maxY-minY);
+    const bcx=(minX+maxX)/2,bcy=(minY+maxY)/2;
+    const W=canvas.clientWidth,H=canvas.clientHeight;
+    const panelOpen=activePanel&&activePanel.classList.contains('vis');
+    const sLeft=20, sRight=panelOpen?W-290:W-20, sTop=24, sBottom=H-24;
+    const sw=Math.max(80,sRight-sLeft), sh=Math.max(80,sBottom-sTop);
+    let sc=Math.min(sw/bw, sh/bh)*0.9;
+    sc=Math.max(0.15,Math.min(5,sc));
+    const scx=sLeft+sw/2, scy=sTop+sh/2;
+    const tX=scx-bcx*sc, tY=scy-bcy*sc;
+    tweenTF(netTF,()=>applyNTF(g),tX,tY,sc);
+  };
   document.getElementById('net-panel-close').onclick=()=>{netSel=null;netReset();hideTT();};
   svg.addEventListener('click',e=>{if(!e.target.closest('[data-label]')){netSel=null;netReset();hideTT();}});
 
@@ -1538,46 +1749,7 @@ function buildNet(){
       grp.appendChild(svgEl('polygon',{points:p.x+','+(p.y-s)+' '+(p.x-s*.87)+','+(p.y+s*.5)+' '+(p.x+s*.87)+','+(p.y+s*.5),fill:col+'bb',stroke:col,'stroke-width':'1'}));
       const t=svgEl('text',{x:p.x,y:p.y+s+10,'text-anchor':'middle',fill:'rgba(255,255,255,.6)','font-size':'7.5','font-family':'DM Sans,sans-serif',style:'pointer-events:none'});t.textContent=key.length>20?key.slice(0,19)+'…':key;grp.appendChild(t);
     } else if(el.type==='Partner'){
-      const accentCols=partnerColors(key);
-      const padL=9,padR=7,maxChipW=160,lineH=11,fontSize='9';
-      // Measure full text
-      const tMeasure=svgEl('text',{'font-size':fontSize,'font-family':'DM Sans,sans-serif'});
-      tMeasure.textContent=key;nodeG.appendChild(tMeasure);
-      const fullTW=tMeasure.getComputedTextLength()||key.length*5.2;
-      nodeG.removeChild(tMeasure);
-      // Decide if wrapping needed
-      let lines=[key];
-      if(padL+fullTW+padR>maxChipW){
-        // Split at last space before midpoint
-        const words=key.split(' ');let l1='',l2='';
-        for(let i=0;i<words.length-1;i++){
-          const candidate=words.slice(0,i+1).join(' ');
-          const rest=words.slice(i+1).join(' ');
-          if(candidate.length/(candidate.length+rest.length)>=0.45){l1=candidate;l2=rest;break;}
-        }
-        if(!l1){l1=words.slice(0,Math.ceil(words.length/2)).join(' ');l2=words.slice(Math.ceil(words.length/2)).join(' ');}
-        lines=[l1,l2];
-      }
-      // Measure widest line
-      let chipW=maxChipW;
-      const tMeasure2=svgEl('text',{'font-size':fontSize,'font-family':'DM Sans,sans-serif'});
-      nodeG.appendChild(tMeasure2);
-      chipW=Math.min(maxChipW, padL+Math.max(...lines.map(l=>{tMeasure2.textContent=l;return tMeasure2.getComputedTextLength()||l.length*5.2;}))+padR);
-      nodeG.removeChild(tMeasure2);
-      const chipH=lines.length>1?24:20;
-      const x0=p.x;
-      grp.appendChild(svgEl('rect',{x:x0,y:p.y-chipH/2,width:chipW,height:chipH,rx:'3',fill:'transparent'}));
-      const bg=svgEl('rect',{x:x0,y:p.y-chipH/2,width:chipW,height:chipH,rx:'3',fill:'rgba(255,255,255,.06)',stroke:'rgba(255,255,255,.18)','stroke-width':'0.8'});
-      grp.appendChild(bg);
-      drawAccentBar(grp,x0,p.y-chipH/2,chipH,accentCols);
-      const totalTH=lines.length*lineH;
-      lines.forEach((l,li)=>{
-        const t=svgEl('text',{x:x0+padL,y:p.y-totalTH/2+li*lineH+lineH*0.85,fill:'rgba(255,255,255,.75)','font-size':fontSize,'font-family':'DM Sans,sans-serif',style:'pointer-events:none'});
-        t.textContent=l;grp.appendChild(t);
-      });
-      const allTxts=grp.querySelectorAll?grp.querySelectorAll('text'):[];
-      grp.addEventListener('mouseenter',e=>{bg.setAttribute('fill','rgba(255,255,255,.12)');bg.setAttribute('stroke','rgba(255,255,255,.4)');grp.querySelectorAll('text').forEach(t=>t.setAttribute('fill','rgba(255,255,255,.95)'));startHoverTT(key,e);});
-      grp.addEventListener('mouseleave',()=>{bg.setAttribute('fill','rgba(255,255,255,.06)');bg.setAttribute('stroke','rgba(255,255,255,.18)');grp.querySelectorAll('text').forEach(t=>t.setAttribute('fill','rgba(255,255,255,.75)'));clearHoverTT();});
+      drawPartnerChip(grp, nodeG, key, p.x, p.y, {wrap:true, maxChipW:160});
     } else if(el.type==='Workstream'){
       // Workstreams are not shown on slide 5 — visible on slide 4 only
       return;
@@ -1845,8 +2017,20 @@ function buildNet(){
     // Clamp to viewport
     const l = parseFloat(tourEl.style.left);
     const t = parseFloat(tourEl.style.top);
-    tourEl.style.left = Math.max(8, Math.min(l, window.innerWidth - tw - 8)) + 'px';
-    tourEl.style.top  = Math.max(8, Math.min(t, window.innerHeight - th - 8)) + 'px';
+    const finalLeft = Math.max(8, Math.min(l, window.innerWidth - tw - 8));
+    const finalTop  = Math.max(8, Math.min(t, window.innerHeight - th - 8));
+    tourEl.style.left = finalLeft + 'px';
+    tourEl.style.top  = finalTop + 'px';
+    // Re-align arrow to the actual anchor position after viewport clamping
+    if (step.side === 'left' || step.side === 'right') {
+      const anchorCY = r.top + r.height/2;
+      const arrowY = Math.max(8, Math.min(th - 8, anchorCY - finalTop));
+      tourArrow.style.top = arrowY + 'px';
+    } else if (step.side === 'top' || step.side === 'bottom') {
+      const anchorCX = r.left + r.width/2;
+      const arrowX = Math.max(8, Math.min(tw - 8, anchorCX - finalLeft));
+      tourArrow.style.left = arrowX + 'px';
+    }
   }
 
   function endTour() {
