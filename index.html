@@ -74,15 +74,15 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:'DM San
 #slide4{background:var(--navy)}
 #loi-canvas{flex:1;min-height:0;width:100%;position:relative;cursor:grab}
 #loi-canvas:active{cursor:grabbing}
-#loi-svg{width:100%;height:100%;display:block}
+#loi-svg{width:100%;height:100%;display:block;position:relative;z-index:2}
 /* SLIDE 5 */
 #slide5{background:#0a1628}
 #net-canvas{flex:1;min-height:0;width:100%;position:relative;cursor:grab}
 #net-canvas:active{cursor:grabbing}
-#net-svg{width:100%;height:100%;display:block}
+#net-svg{width:100%;height:100%;display:block;position:relative;z-index:2}
 /* TOOLTIP */
 #tt{position:fixed;z-index:9999;max-width:340px;min-width:220px;background:var(--navy2);border:1px solid rgba(200,150,62,.3);border-radius:6px;padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,.5);opacity:0;transition:opacity .15s;pointer-events:none;max-height:75vh;overflow-y:auto}
-.map-panel{position:absolute;top:120px;right:0;bottom:0;width:280px;background:rgba(247,243,237,0.97);border-left:1px solid rgba(200,150,62,.25);border-top:1px solid rgba(200,150,62,.25);display:flex;flex-direction:column;z-index:20;transform:translateX(100%);transition:transform .25s ease;pointer-events:none}
+.map-panel{position:absolute;top:16px;right:0;bottom:0;width:280px;background:rgba(247,243,237,0.97);border-left:1px solid rgba(200,150,62,.25);border-top:1px solid rgba(200,150,62,.25);display:flex;flex-direction:column;z-index:20;transform:translateX(100%);transition:transform .25s ease;pointer-events:none}
 .map-panel.vis{transform:translateX(0);pointer-events:all}
 .map-panel-inner{flex:1;overflow-y:auto;padding:16px 16px 12px}
 .map-panel-close{position:absolute;top:10px;right:10px;background:transparent;border:none;cursor:pointer;font-size:16px;color:var(--textd);line-height:1;padding:2px 6px;border-radius:3px}
@@ -181,7 +181,7 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:'DM San
        <div class="mp-body" id="loi-panel-body"></div>
       </div>
      </div>
-     <div id="loi-hypothesis" style="position:absolute;top:16px;left:18px;width:280px;background:rgba(247,243,237,0.97);border:1px solid rgba(200,150,62,.3);border-radius:6px;padding:16px 18px;box-shadow:0 4px 20px rgba(0,0,0,.25);z-index:5;pointer-events:none;">
+     <div id="loi-hypothesis" style="position:absolute;top:16px;left:18px;width:280px;background:rgba(247,243,237,0.97);border:1px solid rgba(200,150,62,.3);border-radius:6px;padding:16px 18px;box-shadow:0 4px 20px rgba(0,0,0,.25);z-index:1;pointer-events:none;">
       <div class="mp-type">Context</div>
       <div class="mp-title">Introduction</div>
       <div class="mp-body">Consolidating and further enhancing human progress requires a diagnosis of the underlying leadership challenge for the 21st Century, a hypothesis what is needed to address it, and a collective effort in response.</div>
@@ -252,7 +252,7 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:'DM San
       <div class="mp-body" id="net-panel-body"></div>
      </div>
     </div>
-    <div id="net-hypothesis" style="position:absolute;top:16px;left:18px;width:280px;background:rgba(247,243,237,0.97);border:1px solid rgba(200,150,62,.3);border-radius:6px;padding:16px 18px;box-shadow:0 4px 20px rgba(0,0,0,.25);z-index:5;pointer-events:none;">
+    <div id="net-hypothesis" style="position:absolute;top:16px;left:18px;width:280px;background:rgba(247,243,237,0.97);border:1px solid rgba(200,150,62,.3);border-radius:6px;padding:16px 18px;box-shadow:0 4px 20px rgba(0,0,0,.25);z-index:1;pointer-events:none;">
      <div class="mp-type">Our strategy</div>
      <div class="mp-title">Creating a future-fit Australia</div>
      <div class="mp-body">Our portfolio of partnerships, initiatives and outputs aims to activate systemic levers, and strengthen future-fit leadership capability for multiple cohorts of Australians.</div>
@@ -604,12 +604,12 @@ function goTo(idx){
     setActivePanel('loi-panel');
     if(!loiBuilt)requestAnimationFrame(()=>requestAnimationFrame(buildLOI));
     else if(typeof applyLOIFilter==='function')applyLOIFilter(); // reapply 'All' filter on revisit
-    if(loiBuilt&&loiDefaultTF){loiTF={...loiDefaultTF};const lg=document.getElementById('loi-g');if(lg)applyLTF(lg);}
+    if(loiBuilt&&loiDefaultTF){Object.assign(loiTF,loiDefaultTF);const lg=document.getElementById('loi-g');if(lg)applyLTF(lg);}
   } else if(idx===3){
     setActivePanel('net-panel');
     if(!netBuilt)requestAnimationFrame(()=>requestAnimationFrame(buildNet));
     else if(typeof applyFilters==='function')applyFilters();
-    if(netBuilt&&netDefaultTF){netTF={...netDefaultTF};const ng=document.getElementById('net-g');if(ng)applyNTF(ng);}
+    if(netBuilt&&netDefaultTF){Object.assign(netTF,netDefaultTF);const ng=document.getElementById('net-g');if(ng)applyNTF(ng);}
   } else {
     activePanel=null;
   }
@@ -741,7 +741,24 @@ function setupPZ(container,svg,g,tf,apply){
   container.addEventListener('mousedown',e=>{drag=true;lx=e.clientX;ly=e.clientY;e.preventDefault();});
   window.addEventListener('mouseup',()=>drag=false);
   window.addEventListener('mousemove',e=>{if(!drag)return;tf.x+=e.clientX-lx;tf.y+=e.clientY-ly;lx=e.clientX;ly=e.clientY;apply();});
-  container.addEventListener('wheel',e=>{e.preventDefault();const r=container.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top,f=e.deltaY<0?1.1:0.9;tf.x=mx-(mx-tf.x)*f;tf.y=my-(my-tf.y)*f;tf.scale=Math.max(.1,Math.min(5,tf.scale*f));apply();},{passive:false});
+  container.addEventListener('wheel',e=>{
+    // Context-aware: if hovering over the side panel (or any scrollable container),
+    // let native scroll handle it and never zoom — even at scroll edges.
+    if(e.target.closest('.map-panel'))return;
+    let n=e.target;
+    while(n&&n!==container){
+      if(n.nodeType===1){
+        const oy=getComputedStyle(n).overflowY;
+        if(oy==='auto'||oy==='scroll')return;
+      }
+      n=n.parentNode;
+    }
+    e.preventDefault();
+    const r=container.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top,f=e.deltaY<0?1.1:0.9;
+    tf.x=mx-(mx-tf.x)*f;tf.y=my-(my-tf.y)*f;
+    tf.scale=Math.max(.1,Math.min(5,tf.scale*f));
+    apply();
+  },{passive:false});
   let ltd=null;
   container.addEventListener('touchstart',e=>{if(e.touches.length===1){drag=true;lx=e.touches[0].clientX;ly=e.touches[0].clientY;}if(e.touches.length===2)ltd=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);e.preventDefault();},{passive:false});
   container.addEventListener('touchmove',e=>{if(e.touches.length===1&&drag){tf.x+=e.touches[0].clientX-lx;tf.y+=e.touches[0].clientY-ly;lx=e.touches[0].clientX;ly=e.touches[0].clientY;apply();}if(e.touches.length===2&&ltd){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);tf.scale=Math.max(.1,Math.min(5,tf.scale*d/ltd));ltd=d;apply();}e.preventDefault();},{passive:false});
@@ -802,8 +819,8 @@ function buildLOI(){
 
   // ── Relative layout constants ──
   const iW=110, iGap=10;
-  // perRow=6 ensures Innovation fits in 2 rows and total width ≤ 6-LOI row (850px)
-  const perRow=6;
+  // perRow=7 keeps initiatives row within the 6-LOI row width (830px ≤ 850px)
+  const perRow=7;
   const INIT_LINE_H=13, INIT_VPAD=6;  // tighter vertical padding each side
   const INIT_H=3*INIT_LINE_H+INIT_VPAD*2; // uniform height: 3 lines + padding = 51px
   const BOX_GAP=8;
@@ -848,15 +865,13 @@ function buildLOI(){
   const partnerSet={};
   CONNECTIONS.forEach(c=>{if(c.type==='Partner'&&nodes[c.to]&&ELEMENTS[c.from]?.type==='Partner'){if(!partnerSet[c.from])partnerSet[c.from]=[];partnerSet[c.from].push(c.to);}});
   const allPartners=Object.keys(partnerSet).sort((a,b)=>a.localeCompare(b));
-  const chipH2=20, chipRowH=26;
-  // Estimate chip widths from character count (g not yet in DOM here)
-  // Individual chips are measured precisely when drawn below
-  const maxChipW=9+Math.max(...allPartners.map(p=>p.length*5.5))+7;
-  const colGap=12;
-  const colW=Math.ceil(maxChipW)+colGap;
-  const avail=W-mapLeft-40;
-  const maxColsByLOI=Math.floor(qTW/colW);
-  const pCols=Math.max(1,Math.min(Math.floor(avail/colW),maxColsByLOI));
+  // 3 columns within qTW (850px): cap each chip at ~270px and use a small col gap.
+  // Long partner labels wrap to two lines (drawPartnerChip's wrap:true path).
+  const chipH2=24, chipRowH=30;
+  const partnerChipMaxW=270;
+  const colGap=10;
+  const colW=partnerChipMaxW+colGap;
+  const pCols=3;
   const pY=curY;
   allPartners.forEach((p,i)=>nodes[p]={x:mapLeft+20+(i%pCols)*colW, y:pY+(Math.floor(i/pCols))*chipRowH+chipH2/2, w:0, h:chipH2, isPart:true});
 
@@ -1010,7 +1025,7 @@ function buildLOI(){
   allInits.forEach(k=>{const cat=ELEMENTS[k]?.category||'';drawBox(k,{fill:CC[cat]||'#555',stroke:'rgba(255,255,255,.2)',sw:'1',fs:'9',rx:2});});
   allPartners.forEach(p=>{const n=nodes[p];if(!n)return;
     const grp=svgEl('g',{class:'ln','data-label':p,style:'cursor:pointer'});
-    drawPartnerChip(grp, g, p, n.x, n.y, {wrap:false});
+    drawPartnerChip(grp, g, p, n.x, n.y, {wrap:true, maxChipW:partnerChipMaxW});
     grp.addEventListener('click',e=>{e.stopPropagation();loiClick(p);});
     g.appendChild(grp);});
 
@@ -1126,7 +1141,7 @@ function buildLOI(){
   setupPZ(canvas,svg,g,loiTF,()=>applyLTF(g));
   document.getElementById('loi-zi').onclick=()=>{loiTF.scale=Math.min(loiTF.scale*1.2,4);applyLTF(g);};
   document.getElementById('loi-zo').onclick=()=>{loiTF.scale=Math.max(loiTF.scale/1.2,.2);applyLTF(g);};
-  document.getElementById('loi-zf').onclick=()=>{loiTF={x:tx,y:ty,scale:scl};applyLTF(g);};
+  document.getElementById('loi-zf').onclick=()=>{Object.assign(loiTF,{x:tx,y:ty,scale:scl});applyLTF(g);};
 }
 
 // ── Shared partner helpers (used by both buildLOI and buildNet) ──────────
@@ -1921,7 +1936,7 @@ function buildNet(){
   setupPZ(canvas,svg,g,netTF,()=>applyNTF(g));
   document.getElementById('net-zi').onclick=()=>{netTF.scale=Math.min(netTF.scale*1.25,5);applyNTF(g);};
   document.getElementById('net-zo').onclick=()=>{netTF.scale=Math.max(netTF.scale/1.25,.15);applyNTF(g);};
-  document.getElementById('net-zf').onclick=()=>{netTF={x:tx,y:ty,scale:sc};applyNTF(g);};
+  document.getElementById('net-zf').onclick=()=>{Object.assign(netTF,{x:tx,y:ty,scale:sc});applyNTF(g);};
 }
   // ── GUIDED TOUR ──────────────────────────────────────────────────────────
   const TOUR_STEPS = [
