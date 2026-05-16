@@ -112,8 +112,8 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:'DM San
 #tt .tchips{display:flex;flex-wrap:wrap;gap:4px}
 #tt .tchip{font-size:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:3px;padding:3px 7px;color:rgba(255,255,255,.75);line-height:1.4;cursor:pointer;transition:background .15s,border-color .15s}
 #tt .tchip:hover{background:rgba(200,150,62,.2);border-color:rgba(200,150,62,.5)}
-@keyframes pulseSelected{0%,100%{filter:drop-shadow(0 0 0 rgba(255,220,140,0))}50%{filter:drop-shadow(0 0 14px rgba(255,220,140,0.95))}}
-.pulse-sel{animation:pulseSelected 0.55s ease-in-out 3}
+@keyframes pulseSelected{0%{filter:drop-shadow(0 0 0 rgba(255,235,180,0))}40%{filter:drop-shadow(0 0 32px rgba(255,235,180,1)) drop-shadow(0 0 14px rgba(255,235,180,1))}100%{filter:drop-shadow(0 0 0 rgba(255,235,180,0))}}
+.pulse-sel{animation:pulseSelected 1.4s ease-in-out 1}
 </style>
 </head>
 <body>
@@ -602,6 +602,7 @@ const tt=document.getElementById('tt'),ttType=document.getElementById('tt-type')
 let loiClickFn=null,netClickFn=null;
 let loiResetFn=null,netResetFn=null;
 let applyFiltersFn=null,applyLOIFilterFn=null;
+let loiFitFn=null,netFitFn=null;
 function loiReset(){if(loiResetFn)loiResetFn();}
 function netReset(){if(netResetFn)netResetFn();}
 function applyFilters(){if(applyFiltersFn)applyFiltersFn();}
@@ -621,8 +622,10 @@ function buildLists(label){
   if(type==='Initiative'){
     const p=CONNECTIONS.filter(c=>c.type==='Partner'&&c.to===label&&ELEMENTS[c.from]).map(c=>c.from);
     if(p.length)secs.push({t:'Partners involved',items:p});
-    const o=CONNECTIONS.filter(c=>c.type==='Output'&&c.to===label&&ELEMENTS[c.from]).map(c=>c.from);
-    if(o.length)secs.push({t:'Related outputs',items:o});
+    if(cur!==2){
+      const o=CONNECTIONS.filter(c=>c.type==='Output'&&c.to===label&&ELEMENTS[c.from]).map(c=>c.from);
+      if(o.length)secs.push({t:'Related outputs',items:o});
+    }
   }
   if(type==='Partner'){
     const i=CONNECTIONS.filter(c=>c.type==='Partner'&&c.from===label&&ELEMENTS[c.to]).map(c=>c.to);
