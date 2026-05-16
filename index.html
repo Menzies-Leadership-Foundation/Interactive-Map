@@ -123,8 +123,8 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:'DM San
    <div class="ey">Menzies Leadership Foundation</div>
    <h1 class="h1">Fostering future-fit leadership</h1><div class="dv"></div>
    <div class="bd"><p>Humanity's astounding progress through the Industrial and Technological revolutions has created an immense challenge and opportunity for the 21st century.</p><p>Navigating this in Australia requires:</p>
-   <ol><li><b>A leadership hypothesis:</b> A diagnosis of the leadership challenges for the 21st century, and a hypothesis on how to address them; and,</li>
-   <li><b>A future-fit Australia:</b> Strategies to cultivate future-fit leadership for all Australians.</li></ol></div>
+   <ol><li><b>A leadership hypothesis</b> — A diagnosis of the leadership challenges for the 21st century, and a hypothesis on how to address them; and,</li>
+   <li><b>A future-fit Australia</b> — Strategies to cultivate future-fit leadership for all Australians.</li></ol></div>
   </div></div>
   <div class="slide ts" id="slide2"><div class="ti">
    <div class="ey">Overview</div><h1 class="h1">Navigating the challenge</h1><div class="dv"></div>
@@ -201,11 +201,11 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:'DM San
      <div class="fbg" id="cat-filters">
       <button class="cfb active" data-cat="all">All categories</button>
       <button class="cfb" data-cat="Community resilience">Community resilience</button>
-      <button class="cfb" data-cat="Education outcomes">Education outcomes</button>
       <button class="cfb" data-cat="Indigenous self-determination">Indigenous self-det.</button>
+      <button class="cfb" data-cat="Education outcomes">Education outcomes</button>
       <button class="cfb" data-cat="Youth development">Youth development</button>
-      <button class="cfb" data-cat="Insight and influence">Insight &amp; influence</button>
       <button class="cfb" data-cat="Technology leadership">Technology leadership</button>
+      <button class="cfb" data-cat="Insight and influence">Insight &amp; influence</button>
      </div>
     </div>
     <div style="display:flex;align-items:center;gap:8px;">
@@ -255,7 +255,7 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:'DM San
    <ul><li><b>Innovation</b> — Catalysing partnerships that build leadership capability.</li>
    <li><b>Insights</b> — Synthesising research and data to advance the field of leadership in complexity.</li>
    <li><b>Influence</b> — Elevating public narratives on leadership, integrity and collective responsibility.</li></ul></div>
-   <div class="wm">Last updated March 2026</div>
+   <div class="wm">Last updated April 2026</div>
   </div></div>
  </div>
  <div id="nav">
@@ -286,7 +286,7 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:'DM San
     <div class="spin" style="width:16px;height:16px;border:2px solid rgba(200,150,62,.3);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;"></div>
     <span style="font-family:'DM Sans',sans-serif;font-size:12px;color:rgba(255,255,255,.4);letter-spacing:.08em;text-transform:uppercase;" id="load-msg">Loading data…</span>
   </div>
-  <button id="enter-btn" style="display:none;margin-top:12px;background:transparent;border:1px solid rgba(200,150,62,.5);color:var(--gold-light);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;padding:12px 36px;border-radius:3px;cursor:pointer;transition:background .2s,border-color .2s;" onmouseover="this.style.background='rgba(200,150,62,.12)';this.style.borderColor='var(--gold)'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(200,150,62,.5)'">Enter Presentation →</button>
+  <button id="enter-btn" style="display:none;margin-top:12px;background:transparent;border:1px solid rgba(200,150,62,.5);color:var(--gold-light);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;padding:12px 36px;border-radius:3px;cursor:pointer;transition:background .2s,border-color .2s;" onmouseover="this.style.background='rgba(200,150,62,.12)';this.style.borderColor='var(--gold)'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(200,150,62,.5)'">Explore →</button>
   <div id="load-err" style="font-family:'DM Sans',sans-serif;font-size:12px;color:rgba(255,255,255,.4);letter-spacing:.08em;text-transform:uppercase;display:none;max-width:400px;text-align:center;line-height:1.6;padding:0 32px;"></div>
 </div>
 <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
@@ -600,6 +600,7 @@ nlbl.textContent=SL[0]+' — 1 of '+slides.length;
 // ── TOOLTIP ──
 const tt=document.getElementById('tt'),ttType=document.getElementById('tt-type'),ttTitle=document.getElementById('tt-title'),ttBody=document.getElementById('tt-body');
 let loiClickFn=null,netClickFn=null;
+let loiNavFn=null,netNavFn=null;
 let loiResetFn=null,netResetFn=null;
 let applyFiltersFn=null,applyLOIFilterFn=null;
 let loiFitFn=null,netFitFn=null;
@@ -1015,15 +1016,31 @@ function buildLOI(){
     });
   }
   document.querySelectorAll('#loi-filters .fb').forEach(btn=>{btn.onclick=function(){
+    const wasActive=this.classList.contains('active');
+    const isAll=this.dataset.show==='all';
     document.querySelectorAll('#loi-filters .fb').forEach(b=>b.classList.remove('active'));
-    this.classList.add('active');
-    loiActiveShow=this.dataset.show;
+    if(wasActive&&!isAll){
+      const allBtn=document.querySelector('#loi-filters .fb[data-show="all"]');
+      if(allBtn)allBtn.classList.add('active');
+      loiActiveShow='all';
+    } else {
+      this.classList.add('active');
+      loiActiveShow=this.dataset.show;
+    }
     applyLOIFilters();
   };});
   document.querySelectorAll('#loi-year-filters .fb').forEach(btn=>{btn.onclick=function(){
+    const wasActive=this.classList.contains('active');
+    const isAll=this.dataset.loiyear==='all';
     document.querySelectorAll('#loi-year-filters .fb').forEach(b=>b.classList.remove('active'));
-    this.classList.add('active');
-    loiActiveYear=this.dataset.loiyear;
+    if(wasActive&&!isAll){
+      const allBtn=document.querySelector('#loi-year-filters .fb[data-loiyear="all"]');
+      if(allBtn)allBtn.classList.add('active');
+      loiActiveYear='all';
+    } else {
+      this.classList.add('active');
+      loiActiveYear=this.dataset.loiyear;
+    }
     applyLOIFilters();
   };});
   applyLOIFilterFn=applyLOIFilters;
@@ -1686,9 +1703,48 @@ function buildNet(){
     });
   }
   applyFiltersFn=applyFilters;
-  document.querySelectorAll('#slide5 .fbg .fb[data-type]').forEach(btn=>{btn.onclick=function(){document.querySelectorAll('#slide5 .fbg .fb[data-type]').forEach(b=>b.classList.remove('active'));this.classList.add('active');netActiveType=this.dataset.type;applyFilters();};});
-  document.querySelectorAll('#cat-filters .cfb').forEach(btn=>{btn.onclick=function(){document.querySelectorAll('#cat-filters .cfb').forEach(b=>b.classList.remove('active'));this.classList.add('active');netActiveCat=this.dataset.cat;applyFilters();};});
-  document.querySelectorAll('#year-filters .fb').forEach(btn=>{btn.onclick=function(){document.querySelectorAll('#year-filters .fb').forEach(b=>b.classList.remove('active'));this.classList.add('active');netActiveYear=this.dataset.year;applyFilters();};});
+  document.querySelectorAll('#slide5 .fbg .fb[data-type]').forEach(btn=>{btn.onclick=function(){
+    const wasActive=this.classList.contains('active');
+    const isAll=this.dataset.type==='all';
+    document.querySelectorAll('#slide5 .fbg .fb[data-type]').forEach(b=>b.classList.remove('active'));
+    if(wasActive&&!isAll){
+      const allBtn=document.querySelector('#slide5 .fbg .fb[data-type="all"]');
+      if(allBtn)allBtn.classList.add('active');
+      netActiveType='all';
+    } else {
+      this.classList.add('active');
+      netActiveType=this.dataset.type;
+    }
+    applyFilters();
+  };});
+  document.querySelectorAll('#cat-filters .cfb').forEach(btn=>{btn.onclick=function(){
+    const wasActive=this.classList.contains('active');
+    const isAll=this.dataset.cat==='all';
+    document.querySelectorAll('#cat-filters .cfb').forEach(b=>b.classList.remove('active'));
+    if(wasActive&&!isAll){
+      const allBtn=document.querySelector('#cat-filters .cfb[data-cat="all"]');
+      if(allBtn)allBtn.classList.add('active');
+      netActiveCat='all';
+    } else {
+      this.classList.add('active');
+      netActiveCat=this.dataset.cat;
+    }
+    applyFilters();
+  };});
+  document.querySelectorAll('#year-filters .fb').forEach(btn=>{btn.onclick=function(){
+    const wasActive=this.classList.contains('active');
+    const isAll=this.dataset.year==='all';
+    document.querySelectorAll('#year-filters .fb').forEach(b=>b.classList.remove('active'));
+    if(wasActive&&!isAll){
+      const allBtn=document.querySelector('#year-filters .fb[data-year="all"]');
+      if(allBtn)allBtn.classList.add('active');
+      netActiveYear='all';
+    } else {
+      this.classList.add('active');
+      netActiveYear=this.dataset.year;
+    }
+    applyFilters();
+  };});
 
   setupPZ(canvas,svg,g,netTF,()=>applyNTF(g));
   document.getElementById('net-zi').onclick=()=>{netTF.scale=Math.min(netTF.scale*1.25,5);applyNTF(g);};
