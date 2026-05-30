@@ -275,7 +275,14 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:'DM San
    <ul><li><b>Innovation</b> — Catalysing partnerships that build leadership capability.</li>
    <li><b>Insights</b> — Synthesising research and data to advance the field of leadership in complexity.</li>
    <li><b>Influence</b> — Elevating public narratives on leadership, integrity and collective responsibility.</li></ul>
-   <p>Learn more about future-fit leadership on our website <a href="https://menziesfoundation.org.au" target="_blank">here</a>.</p></div>
+   <p>Learn more about future-fit leadership on our website <a href="https://menziesfoundation.org.au" target="_blank">here</a>.</p>
+   <div style="margin-top:28px;display:flex;flex-direction:column;align-items:flex-start;gap:8px;">
+     <button id="dl-pdf-btn" style="background:transparent;border:1px solid rgba(200,150,62,.5);color:var(--gold-light);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;padding:12px 28px;border-radius:3px;cursor:pointer;display:inline-flex;align-items:center;gap:12px;transition:background .2s,border-color .2s;" onmouseover="this.style.background='rgba(200,150,62,.12)';this.style.borderColor='var(--gold)'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(200,150,62,.5)'">
+       <span id="dl-pdf-label">Download a static copy of the map</span>
+       <span id="dl-pdf-spinner" style="display:none;width:14px;height:14px;border:2px solid rgba(200,150,62,.3);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;"></span>
+     </button>
+     <div id="dl-pdf-note" style="font-family:'DM Sans',sans-serif;font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.04em;"></div>
+   </div></div>
    <div class="wm">Last updated May 2026</div>
   </div></div>
  </div>
@@ -618,6 +625,40 @@ function goTo(idx){
 document.getElementById('btn-back').onclick=()=>cur>0&&goTo(cur-1);
 document.getElementById('btn-next').onclick=()=>cur<slides.length-1&&goTo(cur+1);
 document.getElementById('btn-back').disabled=true;
+
+// ── Download PDF button (final slide) ─────────────────────────────────────
+const PDF_URL = 'MLF-Future-Fit-Leadership-DRAFT.pdf';
+const dlBtn  = document.getElementById('dl-pdf-btn');
+const dlSpin = document.getElementById('dl-pdf-spinner');
+const dlLbl  = document.getElementById('dl-pdf-label');
+const dlNote = document.getElementById('dl-pdf-note');
+if(dlBtn){
+  dlBtn.addEventListener('click', async () => {
+    dlBtn.disabled = true;
+    dlSpin.style.display = 'inline-block';
+    dlLbl.textContent = 'Preparing your copy…';
+    dlNote.textContent = '';
+    try{
+      const res = await fetch(PDF_URL, {cache:'no-store'});
+      if(!res.ok) throw new Error('http ' + res.status);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'MLF-Fostering-Future-Fit-Leadership.pdf';
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+      dlLbl.textContent = 'Download a static copy of the map';
+      dlNote.textContent = 'Downloaded — check your browser downloads.';
+    }catch(err){
+      dlLbl.textContent = 'Download a static copy of the map';
+      dlNote.textContent = "Sorry — the PDF couldn't be reached. Please try again.";
+    }finally{
+      dlSpin.style.display = 'none';
+      dlBtn.disabled = false;
+    }
+  });
+}
 nlbl.textContent=SL[0]+' — 1 of '+slides.length;
 
 // ── TOOLTIP ──
@@ -701,9 +742,51 @@ function setActivePanel(panelId){
   activePanelBody  = document.getElementById(panelId.replace('panel','panel-body'));
 }
 
+// Workstream descriptions follow a pattern:
+//   [lead] \n\n [header (often with first item glued onto it)] \n\n [item 2] \n\n [item 3]
+// Render the items as proper bullets when the element is a Workstream.
+function formatWorkstreamDesc(raw){
+  const paras = (raw||'').split(/\n{2,}/).map(p=>p.trim()).filter(Boolean);
+  if(paras.length < 2) return (raw||'').replace(/\n/g,'<br>');
+  const lead = paras[0];
+  const rest = paras.slice(1);
+  let header = '', firstItem = '';
+  const others = rest.slice(1);
+  const first = rest[0];
+  if(first.includes(':')){
+    const idx = first.indexOf(':');
+    header = first.slice(0, idx).trim();
+    firstItem = first.slice(idx+1).trim();
+  } else {
+    const m = first.slice(0,120).match(/([a-z])([A-Z][a-z])/);
+    if(m){
+      const cut = m.index + 1;
+      header = first.slice(0, cut).trim();
+      firstItem = first.slice(cut).trim();
+    } else { firstItem = first; }
+  }
+  const items = [];
+  if(firstItem) items.push(firstItem);
+  others.forEach(p=>items.push(p));
+  let html = `<p>${lead.replace(/\n/g,'<br>')}</p>`;
+  if(header) html += `<p style="margin-top:8px;"><b>${header}:</b></p>`;
+  if(items.length){
+    html += '<ul style="margin:4px 0 0 18px;padding:0;">';
+    items.forEach(it=>{ html += `<li style="margin-bottom:4px;">${it.replace(/\n/g,'<br>')}</li>`; });
+    html += '</ul>';
+  }
+  return html;
+}
+
 function showTT(label,x,y){
   const el=ELEMENTS[label];if(!el)return;
-  let d=(el.description||'').replace(/\n/g,'<br>').replace(/<a /g,'<a target="_blank" rel="noopener" ');
+  let d;
+  if(el.type === 'Workstream'){
+    d = formatWorkstreamDesc(el.description || '');
+  } else {
+    d = (el.description||'').replace(/\n/g,'<br>');
+  }
+  d = d.replace(/<a /g,'<a target="_blank" rel="noopener" ');
   d=d.replace(/(\s*<br\s*\/?>\s*)+$/,'').trimEnd();
   const content=d+buildLists(label);
   if(activePanel){
