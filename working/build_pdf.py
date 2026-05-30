@@ -1,3 +1,4 @@
+
 """Generate the 17-page A4 draft PDF for Menzies Leadership Foundation.
 
 Brand palette and content sourced from /mnt/workspace/output/index.html
