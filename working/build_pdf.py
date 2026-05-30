@@ -69,6 +69,11 @@ def _locate_index_html():
 
 INDEX_PATH = _locate_index_html()
 OUTPUT_DIR = INDEX_PATH.parent
+
+# Cover logo (navy MLF "Leadership" emblem) — lives beside this script so the
+# GitHub runner finds it via a repo-relative path. Replaces the brand text line.
+LOGO_PATH = Path(__file__).resolve().parent / 'mlf_logo.png'
+
 import json
 import csv
 import io
@@ -170,7 +175,9 @@ def load_cover_text():
     # <title> = "<full title> — <brand>"
     t = re.search(r'<title>([^<]+)</title>', src)
     if t:
-        bits = re.split(r'\s*[—–-]\s*', t.group(1).strip(), maxsplit=1)
+        # Split only on a spaced dash separator, so the hyphen inside a compound
+        # word like "Future-Fit" is not mistaken for the title/brand divider.
+        bits = re.split(r'\s+[—–-]\s+', t.group(1).strip(), maxsplit=1)
         cover['full_title'] = bits[0].strip()
         cover['brand']      = bits[1].strip() if len(bits) > 1 else ''
     # Splash divs inside <div id="loading"> — first child = title, second = subtitle
@@ -453,6 +460,40 @@ def draw_footer(canvas, doc):
     canvas.drawRightString(PAGE_W - MARGIN_R, MARGIN_B - 16, f'Page {doc.page}')
     canvas.restoreState()
 
+# ── Cover mid-page separator ────────────────────────────────────────────────
+# Swap COVER_SEPARATOR to change the motif beneath the subtitle.
+#   'rule'    — a single thin gold line (understated, editorial)
+#   'three'   — three small gold dots
+#   'diamond' — a small gold diamond flanked by two short rules
+#   'dots'    — the original five gold dots
+#   'none'    — nothing (pure whitespace)
+COVER_SEPARATOR = 'rule'
+
+def draw_separator(canvas, cx, cy, style='rule'):
+    canvas.saveState()
+    canvas.setFillColor(GOLD)
+    if style == 'rule':
+        # Match the gold rule beneath the title: width 60, height 2.
+        canvas.rect(cx - 30, cy, 60, 2, stroke=0, fill=1)
+    elif style == 'three':
+        for x in (-12, 0, 12):
+            canvas.circle(cx + x, cy + 1, 2.2, stroke=0, fill=1)
+    elif style == 'diamond':
+        # short rule — gap — diamond — gap — short rule
+        canvas.rect(cx - 40, cy + 1, 22, 1.2, stroke=0, fill=1)
+        canvas.rect(cx + 18, cy + 1, 22, 1.2, stroke=0, fill=1)
+        d = 4
+        canvas.saveState()
+        canvas.translate(cx, cy + 1.5)
+        canvas.rotate(45)
+        canvas.rect(-d / 2, -d / 2, d, d, stroke=0, fill=1)
+        canvas.restoreState()
+    elif style == 'dots':
+        for x in (-30, -15, 0, 15, 30):
+            canvas.circle(cx + x, cy + 1, 2.5, stroke=0, fill=1)
+    # 'none' draws nothing
+    canvas.restoreState()
+
 def draw_cover(canvas, doc):
     """Cover page: white background with dark text and gold accents."""
     canvas.saveState()
@@ -464,20 +505,23 @@ def draw_cover(canvas, doc):
     canvas.rect(0, PAGE_H - 6, PAGE_W, 6, stroke=0, fill=1)
     # Bottom accent (gold)
     canvas.rect(0, 0, PAGE_W, 6, stroke=0, fill=1)
-    # Eyebrow — brand from <title> of the landing page
-    canvas.setFont('Helvetica-Bold', 10)
-    canvas.setFillColor(GOLD)
-    canvas.drawCentredString(PAGE_W/2, PAGE_H - 70*mm,
-                             (COVER.get('brand') or '').upper())
+    # Brand mark — navy MLF logo, centre-justified (replaces brand text line)
+    if LOGO_PATH.is_file():
+        logo_w = 46*mm                      # square emblem
+        logo_h = logo_w
+        canvas.drawImage(str(LOGO_PATH),
+                         PAGE_W/2 - logo_w/2, PAGE_H - 78*mm,
+                         width=logo_w, height=logo_h,
+                         preserveAspectRatio=True, mask='auto')
     # Title — splash title from the landing page (split into two display lines)
     line1, line2 = title_split(COVER.get('title', ''))
     canvas.setFont('Helvetica-Bold', 34)
     canvas.setFillColor(TEXT)
-    canvas.drawCentredString(PAGE_W/2, PAGE_H - 100*mm, line1)
-    canvas.drawCentredString(PAGE_W/2, PAGE_H - 115*mm, line2)
+    canvas.drawCentredString(PAGE_W/2, PAGE_H - 108*mm, line1)
+    canvas.drawCentredString(PAGE_W/2, PAGE_H - 123*mm, line2)
     # Gold rule
     canvas.setFillColor(GOLD)
-    canvas.rect(PAGE_W/2 - 30, PAGE_H - 128*mm, 60, 2, stroke=0, fill=1)
+    canvas.rect(PAGE_W/2 - 30, PAGE_H - 136*mm, 60, 2, stroke=0, fill=1)
     # Subtitle — splash subtitle from the landing page, wrapped into two lines
     sub = COVER.get('subtitle', '')
     canvas.setFont('Helvetica-Oblique', 13)
@@ -485,57 +529,51 @@ def draw_cover(canvas, doc):
     # Wrap at the natural sentence midpoint (after "address")
     if ' address ' in sub:
         a, b = sub.split(' address ', 1)
-        canvas.drawCentredString(PAGE_W/2, PAGE_H - 145*mm, f'{a} address')
-        canvas.drawCentredString(PAGE_W/2, PAGE_H - 152*mm, b)
+        canvas.drawCentredString(PAGE_W/2, PAGE_H - 153*mm, f'{a} address')
+        canvas.drawCentredString(PAGE_W/2, PAGE_H - 160*mm, b)
     else:
-        canvas.drawCentredString(PAGE_W/2, PAGE_H - 145*mm, sub)
-    # Decorative dots
-    canvas.setFillColor(GOLD)
-    for i, x in enumerate([-30, -15, 0, 15, 30]):
-        canvas.circle(PAGE_W/2 + x, PAGE_H - 175*mm, 2.5, stroke=0, fill=1)
+        canvas.drawCentredString(PAGE_W/2, PAGE_H - 153*mm, sub)
+    # Mid-page separator (swap COVER_SEPARATOR to change the motif)
+    draw_separator(canvas, PAGE_W/2, PAGE_H - 221*mm, COVER_SEPARATOR)
 
-    # ── Interactive map call-out (two lines, clickable "here") ──
+    # ── Interactive map call-out (one sentence, clickable "here") ──
     map_url = 'https://menziesfoundation.org.au'
-    # Line 1 — plain centred italic
-    canvas.setFont('Helvetica-Oblique', 11)
-    canvas.setFillColor(TEXTM)
-    y_l1 = PAGE_H - 192*mm
-    canvas.drawCentredString(PAGE_W/2, y_l1,
-        'This document is a static extraction of dynamic data.')
-    # Line 2 — centred, with bold/underlined gold "here" as link
-    prefix = 'Visit the source Interactive Map '
+    prefix = 'This is a static extraction of a live interactive map available '
     here   = 'here'
     suffix = '.'
-    pre_w  = canvas.stringWidth(prefix, 'Helvetica-Oblique', 11)
-    here_w = canvas.stringWidth(here,   'Helvetica-BoldOblique', 11)
-    suf_w  = canvas.stringWidth(suffix, 'Helvetica-Oblique', 11)
-    total  = pre_w + here_w + suf_w
+    pre_w  = canvas.stringWidth(prefix, 'Helvetica', 11)
+    here_w = canvas.stringWidth(here,   'Helvetica-Bold', 11)
+    total  = pre_w + here_w
     x0     = (PAGE_W - total) / 2
-    y_l2   = PAGE_H - 199*mm
-    canvas.setFont('Helvetica-Oblique', 11)
+    y_c    = PAGE_H - 232*mm
+    canvas.setFont('Helvetica', 11)
     canvas.setFillColor(TEXTM)
-    canvas.drawString(x0, y_l2, prefix)
-    canvas.setFont('Helvetica-BoldOblique', 11)
+    canvas.drawString(x0, y_c, prefix)
+    canvas.setFont('Helvetica-Bold', 11)
     canvas.setFillColor(GOLD)
-    canvas.drawString(x0 + pre_w, y_l2, here)
+    canvas.drawString(x0 + pre_w, y_c, here)
     canvas.setStrokeColor(GOLD)
     canvas.setLineWidth(0.6)
-    canvas.line(x0 + pre_w, y_l2 - 1.5, x0 + pre_w + here_w, y_l2 - 1.5)
+    canvas.line(x0 + pre_w, y_c - 1.5, x0 + pre_w + here_w, y_c - 1.5)
     canvas.linkURL(map_url,
-                   (x0 + pre_w, y_l2 - 3, x0 + pre_w + here_w, y_l2 + 10),
+                   (x0 + pre_w, y_c - 3, x0 + pre_w + here_w, y_c + 10),
                    relative=0)
-    canvas.setFont('Helvetica-Oblique', 11)
+    canvas.setFont('Helvetica', 11)
     canvas.setFillColor(TEXTM)
-    canvas.drawString(x0 + pre_w + here_w, y_l2, suffix)
+    canvas.drawString(x0 + pre_w + here_w, y_c, suffix)
 
     # ── Bottom: downloaded date + site ──
+    # Downloaded line matches the callout sentence font (Helvetica 11, TEXTM);
+    # the site line matches the previous Downloaded size (Helvetica 9).
+    # "Downloaded …" sits directly under the callout sentence (one line below);
+    # the site line follows beneath it.
+    canvas.setFont('Helvetica', 11)
+    canvas.setFillColor(TEXTM)
+    canvas.drawCentredString(PAGE_W/2, PAGE_H - 239*mm,
+        f'Downloaded {date.today().strftime("%-d %B %Y")}')
     canvas.setFont('Helvetica', 9)
     canvas.setFillColor(TEXTD)
-    canvas.drawCentredString(PAGE_W/2, 35*mm,
-        f'Downloaded {date.today().strftime("%-d %B %Y")}')
-    canvas.setFont('Helvetica', 7.5)
-    canvas.setFillColor(TEXTD)
-    canvas.drawCentredString(PAGE_W/2, 28*mm, 'menziesfoundation.org.au')
+    canvas.drawCentredString(PAGE_W/2, 36*mm, 'menziesfoundation.org.au')
     canvas.restoreState()
 
 # ── Build the document ────────────────────────────────────────────────────
@@ -587,9 +625,11 @@ def build():
             Paragraph(link_label, ST_TOC),
             Paragraph(link_page, ST_TOC_PG),
         ])
+    # Subtract the Frame's 6pt L/R text inset (12pt total) so the table sits
+    # inside the text frame and its items align under the heading / body text.
+    toc_avail = PAGE_W - MARGIN_L - MARGIN_R - 12
     toc_tbl = Table(toc_rows,
-                    colWidths=[(PAGE_W - MARGIN_L - MARGIN_R) * 0.78,
-                               (PAGE_W - MARGIN_L - MARGIN_R) * 0.22])
+                    colWidths=[toc_avail * 0.78, toc_avail * 0.22])
     toc_tbl.setStyle(TableStyle([
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
         ('LEFTPADDING', (0, 0), (-1, -1), 0),
@@ -710,19 +750,24 @@ def build():
     story.append(Paragraph(
         'We focus on four priority cohorts where leadership capability can drive systemic '
         'change at scale.', ST_BODY))
-    story.append(Spacer(0, 8))
+    story.append(Spacer(0, 6))
+    ST_COHORT_H = ParagraphStyle('cohort_h', parent=ST_H2,
+                                 spaceBefore=4, spaceAfter=3)
+    ST_COHORT_BODY = ParagraphStyle('cohort_body', parent=ST_BODY_TIGHT,
+                                    leading=12, spaceAfter=2)
     cohort_order = ['Citizens', 'Young people', 'Teachers', 'Indigenous women']
     for name in cohort_order:
         el = ELEMENTS.get(name)
         if not el: continue
-        col = CAT_COLOURS.get(el.get('category', ''), TEXTD)
+        cat = el.get('category', '')
+        hexc = CAT_HEX.get(cat, '#8898aa')
+        heading = (f'{name} <font color="{hexc}" size="11">({cat})</font>'
+                   if cat else name)
         story.append(KeepTogether([
-            CategoryStripe(col, 60, 3),
-            Paragraph(el.get('category', '').upper() or 'COHORT', ST_CAT),
-            Paragraph(name, ST_H2),
+            Paragraph(heading, ST_COHORT_H),
             *link_paragraph(name, el.get('url', ''), el.get('description', ''),
-                            ST_BODY_TIGHT, ST_LINK),
-            Spacer(0, 6),
+                            ST_COHORT_BODY, ST_LINK),
+            Spacer(0, 3),
         ]))
     story.append(PageBreak())
 
