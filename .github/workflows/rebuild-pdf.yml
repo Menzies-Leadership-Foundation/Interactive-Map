@@ -1,0 +1,30 @@
+name: Rebuild PDF
+
+on:
+  schedule:
+    - cron: '15 2 * * *'   # daily at 02:15 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install reportlab
+
+      - name: Rebuild PDF from live Google Sheet
+        run: python working/build_pdf.py
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Rebuild PDF from live Google Sheet"
+          # Matches the PDF wherever the script writes it (root, /docs, /output …).
+          file_pattern: "*MLF-Future-Fit-Leadership-DRAFT.pdf"
