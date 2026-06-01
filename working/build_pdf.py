@@ -1,11 +1,10 @@
-
-"""Generate the 17-page A4 draft PDF for Menzies Leadership Foundation.
+"""Generate the A4 draft PDF for Menzies Leadership Foundation.
 
 Brand palette and content sourced from /mnt/workspace/output/index.html
 (FALLBACK_ELEMENTS / FALLBACK_CONNECTIONS).
 """
 import re
-from datetime import date
+from datetime import datetime, timezone
 from pathlib import Path
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.colors import HexColor, Color
@@ -571,7 +570,7 @@ def draw_cover(canvas, doc):
     canvas.setFont('Helvetica', 11)
     canvas.setFillColor(TEXTM)
     canvas.drawCentredString(PAGE_W/2, PAGE_H - 239*mm,
-        f'Downloaded {date.today().strftime("%-d %B %Y")}')
+        f'Extracted {datetime.now(timezone.utc).strftime("%-d %B %Y, %H:%M")} UTC')
     canvas.setFont('Helvetica', 9)
     canvas.setFillColor(TEXTD)
     canvas.drawCentredString(PAGE_W/2, 36*mm, 'menziesfoundation.org.au')
@@ -621,7 +620,7 @@ def build():
     toc_rows = []
     for label, page, anchor in toc_entries:
         link_label = f'<link href="#{anchor}" color="#1a2635">{label}</link>'
-        link_page  = f'<link href="#{anchor}"><font color="#cccccc">·············</font>  {page}</link>'
+        link_page  = f'<link href="#{anchor}">{page}</link>'
         toc_rows.append([
             Paragraph(link_label, ST_TOC),
             Paragraph(link_page, ST_TOC_PG),
