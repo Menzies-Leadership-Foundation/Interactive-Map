@@ -77,7 +77,11 @@ LOGO_PATH = Path(__file__).resolve().parent / 'mlf_logo.png'
 import json
 import csv
 import io
+import os
+import time
+import socket
 import urllib.request
+import urllib.error
 
 CSV_ELEMENTS_URL    = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQJBJjfHVzeooUl9Z2fMJI6e9h_NvOme7GN4k59X0BAkQ0eikwHXokOeCLJX8nS3Q/pub?gid=1554973704&single=true&output=csv'
 CSV_CONNECTIONS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQJBJjfHVzeooUl9Z2fMJI6e9h_NvOme7GN4k59X0BAkQ0eikwHXokOeCLJX8nS3Q/pub?gid=740560254&single=true&output=csv'
@@ -91,10 +95,58 @@ CONN_TYPE_MAP = {
     'Hypothesis':              'Hypothesis',
 }
 
-def _fetch(url, timeout=15):
-    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        return r.read().decode('utf-8')
+def _classify_fetch_error(e):
+    """Return a human-readable category for a fetch exception, so the build log
+    explains *why* a fetch failed rather than just that it did."""
+    if isinstance(e, urllib.error.HTTPError):
+        return (f'HTTP {e.code} {e.reason} — Google refused, rate-limited, or the '
+                f'publish link is wrong')
+    if isinstance(e, urllib.error.URLError):
+        reason = getattr(e, 'reason', e)
+        if isinstance(reason, (socket.timeout, TimeoutError)):
+            return f'timed out waiting for a response ({reason})'
+        return f'network/DNS error — could not reach docs.google.com ({reason})'
+    if isinstance(e, (socket.timeout, TimeoutError)):
+        return f'timed out waiting for a response ({e})'
+    if isinstance(e, ValueError):
+        return str(e)
+    return f'{type(e).__name__}: {e}'
+
+def _fetch(url, label, timeout=20, retries=3):
+    # A fresh cache-buster on every attempt defeats Google's published-CSV cache,
+    # which can otherwise hand an automated build a stale snapshot.
+    sep = '&' if '?' in url else '?'
+    headers = {
+        'User-Agent': ('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 '
+                       '(KHTML, like Gecko) Chrome/124.0 Safari/537.36'),
+        'Accept': 'text/csv,text/plain,*/*',
+        'Cache-Control': 'no-cache',
+    }
+    last = None
+    for attempt in range(1, retries + 1):
+        bust = f'{sep}_cb={int(time.time() * 1000)}'
+        try:
+            req = urllib.request.Request(url + bust, headers=headers)
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                status = getattr(r, 'status', 200)
+                raw = r.read().decode('utf-8', 'replace')
+            head = raw[:200].lstrip().lower()
+            if head.startswith('<!doctype') or '<html' in head:
+                raise ValueError('Google returned an HTML page instead of CSV — the '
+                                 'sheet is likely no longer "Published to web", or '
+                                 'the publish link/permissions changed')
+            if not raw.strip():
+                raise ValueError('response body was empty')
+            print(f'  - {label}: OK on attempt {attempt} (HTTP {status}, {len(raw)} bytes)')
+            return raw
+        except Exception as e:
+            last = e
+            print(f'  - {label}: attempt {attempt}/{retries} failed - '
+                  f'{_classify_fetch_error(e)}')
+            if attempt < retries:
+                time.sleep(1.5 * attempt)
+    raise RuntimeError(f'{label}: all {retries} attempts failed - '
+                       f'{_classify_fetch_error(last)}')
 
 def _build_elements(rows):
     out = {}
@@ -141,8 +193,8 @@ def _csv_to_dicts(text):
     return list(csv.DictReader(io.StringIO(text)))
 
 def _load_from_sheets():
-    el_csv = _fetch(CSV_ELEMENTS_URL)
-    cn_csv = _fetch(CSV_CONNECTIONS_URL)
+    el_csv = _fetch(CSV_ELEMENTS_URL, 'elements tab')
+    cn_csv = _fetch(CSV_CONNECTIONS_URL, 'connections tab')
     elements    = _build_elements(_csv_to_dicts(el_csv))
     connections = _build_connections(_csv_to_dicts(cn_csv))
     return elements, connections
@@ -154,16 +206,39 @@ def _load_from_html():
     return json.loads(el_match.group(1)), json.loads(cn_match.group(1))
 
 def load_data():
-    """Live Google Sheet first; embedded HTML data if the sheet is unreachable."""
+    """The published Google Sheet is the source of truth. The embedded HTML
+    snapshot is used ONLY when ALLOW_EMBEDDED_FALLBACK=1 (e.g. a deliberate
+    offline build). In CI that variable is left unset, so a failed fetch aborts
+    the build loudly instead of silently publishing a stale PDF."""
+    allow_fallback = os.environ.get('ALLOW_EMBEDDED_FALLBACK') == '1'
+    print('-> Fetching live data from the published Google Sheet ...')
     try:
         elements, connections = _load_from_sheets()
-        if elements and connections:
-            print('✓ Loaded live data from Google Sheets')
-            return elements, connections
+        if not (elements and connections):
+            raise RuntimeError(
+                f'sheet reachable but parsed to {len(elements)} elements / '
+                f'{len(connections)} connections - check the tab gids and that the '
+                f'column headers (Label, Type, From, To ...) are intact')
+        print(f'OK  LIVE data loaded: {len(elements)} elements, '
+              f'{len(connections)} connections')
+        return elements, connections
     except Exception as e:
-        print(f'⚠ Sheet fetch failed ({e!s}); falling back to embedded data')
+        print(f'XX  Could not use live sheet data: {e!s}')
+        if not allow_fallback:
+            raise SystemExit(
+                'XX  BUILD ABORTED - refusing to publish from the stale embedded '
+                'snapshot.\n'
+                '    The live PDF will stay at its last good version rather than be '
+                'overwritten with old data.\n'
+                '    See the per-attempt reason(s) above to diagnose the fetch '
+                '(network, HTTP error, HTML-not-CSV, or empty/zero-row parse).\n'
+                '    To intentionally build offline from index.html, set '
+                'ALLOW_EMBEDDED_FALLBACK=1.')
+        print('!!  ALLOW_EMBEDDED_FALLBACK=1 set - using the embedded snapshot from '
+              'index.html instead')
     elements, connections = _load_from_html()
-    print('✓ Loaded embedded fallback data from index.html')
+    print(f'!!  EMBEDDED fallback loaded: {len(elements)} elements, '
+          f'{len(connections)} connections (SAVED SNAPSHOT, not live - may be out of date)')
     return elements, connections
 
 ELEMENTS, CONNECTIONS = load_data()
