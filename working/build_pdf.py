@@ -185,7 +185,7 @@ def _build_connections(rows):
         out.append({
             'from': f, 'to': t,
             'type': CONN_TYPE_MAP.get(raw_type, raw_type),
-            'size': int(r.get('Size') or 1) if (r.get('Size') or '').strip() else 1,
+            'size': float(r.get('Size') or 1) if (r.get('Size') or '').strip() else 1,
         })
     return out
 
