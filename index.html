@@ -113,8 +113,8 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:'DM San
 #tt .tchips{display:flex;flex-wrap:wrap;gap:4px}
 #tt .tchip{font-size:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:3px;padding:3px 7px;color:rgba(255,255,255,.75);line-height:1.4;cursor:pointer;transition:background .15s,border-color .15s}
 #tt .tchip:hover{background:rgba(200,150,62,.2);border-color:rgba(200,150,62,.5)}
-@keyframes pulseSelected{0%{filter:drop-shadow(0 0 0 rgba(247,240,225,0))}40%{filter:drop-shadow(0 0 32px rgba(247,240,225,1)) drop-shadow(0 0 14px rgba(247,240,225,1))}100%{filter:drop-shadow(0 0 0 rgba(247,240,225,0))}}
-.pulse-sel{animation:pulseSelected 1.4s ease-in-out 1}
+@keyframes pulseSelected{0%{filter:drop-shadow(0 0 0 rgba(247,240,225,0));transform:scale(1)}42%{filter:drop-shadow(0 0 22px rgba(247,240,225,.7)) drop-shadow(0 0 10px rgba(247,240,225,.5));transform:scale(1.16)}100%{filter:drop-shadow(0 0 0 rgba(247,240,225,0));transform:scale(1)}}
+.pulse-sel{animation:pulseSelected 1.4s ease-in-out 1;transform-box:fill-box;transform-origin:center}
 #slide5 .fb,#slide5 .cfb{font-size:10px;padding:4px 11px;letter-spacing:.07em}
 #slide5 .cfb{white-space:normal;line-height:1.15;text-align:center}
 .zc-panel{background:rgba(10,22,40,.55);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:6px 12px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;align-self:center}
@@ -278,7 +278,7 @@ html,body{height:100%;overflow:hidden;background:var(--navy);font-family:'DM San
    <p>Learn more about future-fit leadership on our website <a href="https://menziesfoundation.org.au" target="_blank">here</a>.</p>
    <div style="margin-top:28px;display:flex;flex-direction:column;align-items:flex-start;gap:8px;">
      <button id="dl-pdf-btn" style="background:transparent;border:1px solid rgba(200,150,62,.5);color:var(--gold-light);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;padding:12px 28px;border-radius:3px;cursor:pointer;display:inline-flex;align-items:center;gap:12px;transition:background .2s,border-color .2s;" onmouseover="this.style.background='rgba(200,150,62,.12)';this.style.borderColor='var(--gold)'" onmouseout="this.style.background='transparent';this.style.borderColor='rgba(200,150,62,.5)'">
-       <span id="dl-pdf-label">Download a static copy of the map</span>
+       <span id="dl-pdf-label">Download the Map</span>
        <span id="dl-pdf-spinner" style="display:none;width:14px;height:14px;border:2px solid rgba(200,150,62,.3);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;"></span>
      </button>
      <div id="dl-pdf-note" style="font-family:'DM Sans',sans-serif;font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.04em;"></div>
@@ -648,10 +648,10 @@ if(dlBtn){
       a.download = 'MLF-Fostering-Future-Fit-Leadership.pdf';
       document.body.appendChild(a); a.click(); a.remove();
       URL.revokeObjectURL(url);
-      dlLbl.textContent = 'Download a static copy of the map';
+      dlLbl.textContent = 'Download the Map';
       dlNote.textContent = 'Downloaded — check your browser downloads.';
     }catch(err){
-      dlLbl.textContent = 'Download a static copy of the map';
+      dlLbl.textContent = 'Download the Map';
       dlNote.textContent = "Sorry — the PDF couldn't be reached. Please try again.";
     }finally{
       dlSpin.style.display = 'none';
@@ -851,7 +851,7 @@ function setupPZ(container,svg,g,tf,apply){
   container.addEventListener('touchend',()=>{drag=false;ltd=null;});
 }
 
-function tweenTF(tf,applyFn,tX,tY,tS,dur){
+function tweenTF(tf,applyFn,tX,tY,tS,dur,onDone){
   dur=dur||450;
   const sx=tf.x,sy=tf.y,ss=tf.scale,t0=performance.now();
   function step(t){
@@ -862,8 +862,16 @@ function tweenTF(tf,applyFn,tX,tY,tS,dur){
     tf.scale=ss+(tS-ss)*e;
     applyFn();
     if(p<1)requestAnimationFrame(step);
+    else if(onDone)onDone();
   }
   requestAnimationFrame(step);
+}
+// Pulse the selected node within a map container (fires after any re-fit settles).
+function pulseSelNode(container,label){
+  if(!container||!label)return;
+  const esc=(window.CSS&&CSS.escape)?CSS.escape(label):label.replace(/"/g,'\\"');
+  const sn=container.querySelector('[data-label="'+esc+'"]');
+  if(sn){sn.classList.remove('pulse-sel');void sn.getBoundingClientRect();sn.classList.add('pulse-sel');setTimeout(()=>sn.classList.remove('pulse-sel'),1800);}
 }
 
 // ════════════════════════════════════════
@@ -1027,9 +1035,6 @@ function buildLOI(){
       showTT(label,window.innerWidth*.5,window.innerHeight*.4);
       return; // nothing more to highlight on this map
     }
-    const _esc=(window.CSS&&CSS.escape)?CSS.escape(label):label.replace(/"/g,'\\"');
-    const _selNode=g.querySelector('[data-label="'+_esc+'"]');
-    if(_selNode){_selNode.classList.remove('pulse-sel');void _selNode.getBoundingClientRect();_selNode.classList.add('pulse-sel');setTimeout(()=>_selNode.classList.remove('pulse-sel'),1800);}
     const conn=new Set([label]);
     // First hop: direct connections
     CONNECTIONS.forEach(c=>{if(nodes[c.from]&&nodes[c.to]&&(c.from===label||c.to===label)){conn.add(c.from);conn.add(c.to);}});
@@ -1065,6 +1070,9 @@ function buildLOI(){
         if(l.tagName==='line')l.setAttribute('stroke-width','0.5');
       }
     });
+    // Re-fit the map around the connected set (mirrors slide 4's netClick), then
+    // pulse on the tween's completion via loiFitFn.
+    if(loiFitFn)loiFitFn(label);
   }
   loiResetFn=function(){
     g.querySelectorAll('.ln').forEach(n=>n.style.opacity='');
@@ -1219,10 +1227,10 @@ function buildLOI(){
     const sLeft=310, sRight=panelOpen?W-290:W-20, sTop=24, sBottom=H-24;
     const sw=Math.max(80,sRight-sLeft), sh=Math.max(80,sBottom-sTop);
     let sc=Math.min(sw/bw, sh/bh)*0.9;
-    sc=Math.max(0.1,Math.min(5,sc));
+    sc=Math.max(0.1,Math.min(2,sc));
     const scx=sLeft+sw/2, scy=sTop+sh/2;
     const tX=scx-bcx*sc, tY=scy-bcy*sc;
-    tweenTF(loiTF,()=>applyLTF(g),tX,tY,sc);
+    tweenTF(loiTF,()=>applyLTF(g),tX,tY,sc,450,()=>pulseSelNode(g,label));
   };
   setupPZ(canvas,svg,g,loiTF,()=>applyLTF(g));
   document.getElementById('loi-zi').onclick=()=>{loiTF.scale=Math.min(loiTF.scale*1.2,4);applyLTF(g);};
@@ -1659,9 +1667,8 @@ function buildNet(){
     if(!ELEMENTS[label]){hideTT();return;}
     if(netSel===label&&pos[label]){netSel=null;netReset();hideTT();return;}
     netSel=label;netReset();
-    const _esc=(window.CSS&&CSS.escape)?CSS.escape(label):label.replace(/"/g,'\\"');
-    const _selNode=nodeG.querySelector('[data-label="'+_esc+'"]');
-    if(_selNode){_selNode.classList.remove('pulse-sel');void _selNode.getBoundingClientRect();_selNode.classList.add('pulse-sel');setTimeout(()=>_selNode.classList.remove('pulse-sel'),1800);}
+    // Pulse is deferred to netFitFn's tween completion so the node pops only
+    // after the map finishes re-fitting around the connected elements.
     const p=pos[label];if(p){const r=canvas.getBoundingClientRect();showTT(label,r.left+p.x*netTF.scale+netTF.x,r.top+p.y*netTF.scale+netTF.y);}
     else showTT(label,window.innerWidth*.5,window.innerHeight*.4);
     const conn=new Set([label]);
@@ -1779,10 +1786,10 @@ function buildNet(){
     const sLeft=20, sRight=panelOpen?W-290:W-20, sTop=24, sBottom=H-24;
     const sw=Math.max(80,sRight-sLeft), sh=Math.max(80,sBottom-sTop);
     let sc=Math.min(sw/bw, sh/bh)*0.9;
-    sc=Math.max(0.15,Math.min(5,sc));
+    sc=Math.max(0.15,Math.min(1.5,sc));
     const scx=sLeft+sw/2, scy=sTop+sh/2;
     const tX=scx-bcx*sc, tY=scy-bcy*sc;
-    tweenTF(netTF,()=>applyNTF(g),tX,tY,sc);
+    tweenTF(netTF,()=>applyNTF(g),tX,tY,sc,450,()=>pulseSelNode(nodeG,label));
   };
   document.getElementById('net-panel-close').onclick=()=>{netSel=null;netReset();hideTT();};
   svg.addEventListener('click',e=>{if(e.target.closest('.map-panel,.map-hypothesis'))return;if(!e.target.closest('[data-label]')){netSel=null;netReset();hideTT();}});
