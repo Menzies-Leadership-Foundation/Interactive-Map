@@ -537,7 +537,7 @@ def draw_cover(canvas, doc):
     draw_separator(canvas, PAGE_W/2, PAGE_H - 221*mm, COVER_SEPARATOR)
 
     # ── Interactive map call-out (one sentence, clickable "here") ──
-    map_url = 'https://menziesfoundation.org.au'
+    map_url = 'https://menzies-leadership-foundation.github.io/Interactive-Map/'
     prefix = 'This is a static extraction of a live interactive map available '
     here   = 'here'
     suffix = '.'
