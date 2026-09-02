@@ -458,16 +458,43 @@ async function loadSheetData() {
     return {ok: false, error: 'file://'};
   }
   try {
+    // ── Fetch config ────────────────────────────────────────────────────
+    // Shorter per-attempt timeout so a slow/stalled feed drops to the
+    // embedded snapshot quickly instead of holding the loader for ~8s.
+    // One quick retry absorbs transient stalls (e.g. a stuck publish cache)
+    // before we fall back — the feed has been observed to hang momentarily
+    // and recover on a second attempt.
+    const XHR_TIMEOUT = 4500;   // ms per attempt
+    const MAX_ATTEMPTS = 2;     // initial try + 1 retry
+    const RETRY_DELAY  = 400;   // ms pause between attempts
     // Use XMLHttpRequest — more reliable from file:// origins than fetch()
-    function xhrGet(url) {
+    function xhrGetOnce(url) {
       return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
-        xhr.timeout = 8000;
+        xhr.timeout = XHR_TIMEOUT;
         xhr.onload  = () => xhr.status >= 200 && xhr.status < 300 ? resolve(xhr.responseText) : reject(new Error('HTTP ' + xhr.status));
         xhr.onerror = () => reject(new Error('Network error'));
         xhr.ontimeout = () => reject(new Error('Request timed out'));
         xhr.send();
+      });
+    }
+    // Wrap with a bounded retry so one transient failure doesn't force fallback
+    function xhrGet(url) {
+      return new Promise((resolve, reject) => {
+        let attempt = 0;
+        const tryOnce = () => {
+          attempt++;
+          xhrGetOnce(url).then(resolve).catch(err => {
+            if (attempt < MAX_ATTEMPTS) {
+              console.log('Feed attempt ' + attempt + ' failed (' + err.message + ') — retrying…');
+              setTimeout(tryOnce, RETRY_DELAY);
+            } else {
+              reject(err);
+            }
+          });
+        };
+        tryOnce();
       });
     }
     const [elText, cnText] = await Promise.all([
