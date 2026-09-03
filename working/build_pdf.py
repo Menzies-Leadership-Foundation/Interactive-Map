@@ -19,19 +19,19 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 # ── Palette ──────────────────────────────────────────────────────────────
-NAVY   = HexColor('#0f1f35')
-NAVY2  = HexColor('#172844')
-GOLD   = HexColor('#c8963e')
-GOLDL  = HexColor('#e8b96a')
-CREAM  = HexColor('#f7f3ed')
-CREAM2 = HexColor('#ede7dd')
-SLATE  = HexColor('#4a5d73')
+NAVY   = HexColor('#091b31')
+NAVY2  = HexColor('#102135')
+GOLD   = HexColor('#00baca')
+GOLDL  = HexColor('#67d7e0')
+CREAM  = HexColor('#f4f3ef')
+CREAM2 = HexColor('#ece8e1')
+SLATE  = HexColor('#4b6478')
 TEXT   = HexColor('#1a2635')
 TEXTM  = HexColor('#4a5568')
 TEXTD  = HexColor('#8898aa')
 
 CAT_COLOURS = {
-    'Community resilience':          HexColor('#3b9ede'),
+    'Community resilience':          HexColor('#2f6fd0'),
     'Indigenous self-determination': HexColor('#e8b84a'),
     'Education outcomes':            HexColor('#5cb85c'),
     'Youth development':             HexColor('#e87c3e'),
@@ -327,7 +327,7 @@ def _init_workstreams():
 INIT_WS = _init_workstreams()
 
 CAT_HEX = {
-    'Community resilience':          '#3b9ede',
+    'Community resilience':          '#2f6fd0',
     'Indigenous self-determination': '#e8b84a',
     'Education outcomes':            '#5cb85c',
     'Youth development':             '#e87c3e',
@@ -336,9 +336,9 @@ CAT_HEX = {
     '':                              '#8898aa',
 }
 WORKSTREAM_HEX = {
-    'Innovation': '#3b9ede',
-    'Insight':    '#5cb85c',
-    'Influence':  '#d9534f',
+    'Incubation': '#33c7d6',
+    'Insight':    '#33c7d6',
+    'Influence':  '#33c7d6',
 }
 
 def years_label(years):
@@ -356,7 +356,7 @@ def chips_markup(category, workstreams):
         hexc = CAT_HEX.get(category, '#8898aa')
         parts.append(f'<font color="{hexc}" size="11">●</font> <font color="#4a5568"><b>{category}</b></font>')
     for ws in workstreams:
-        whex = WORKSTREAM_HEX.get(ws, '#c8963e')
+        whex = WORKSTREAM_HEX.get(ws, '#33c7d6')
         parts.append(f'<font color="{whex}" size="11">●</font> <font color="#4a5568">{ws}</font>')
     return '   '.join(parts)
 
@@ -370,7 +370,7 @@ def clean_desc(text, url=''):
     def a_to_link(m):
         href = m.group(1)
         body = m.group(2)
-        return f'<link href="{href}" color="#c8963e"><b><u>{body}</u></b></link>'
+        return f'<link href="{href}" color="#33c7d6"><b><u>{body}</u></b></link>'
     t = re.sub(r'<a\s+[^>]*href="([^"]+)"[^>]*>([^<]+)</a>', a_to_link, t)
     # Replace newlines with paragraph breaks
     t = t.replace('\r\n', '\n').replace('\r', '\n')
@@ -401,7 +401,7 @@ def link_here(text, url):
     if not matches:
         return text
     m = matches[-1]
-    link = f'<link href="{url}" color="#c8963e"><b><u>{m.group(0)}</u></b></link>'
+    link = f'<link href="{url}" color="#33c7d6"><b><u>{m.group(0)}</u></b></link>'
     return text[:m.start()] + link + text[m.end():]
 
 def workstream_split(desc):
@@ -518,7 +518,7 @@ MARGIN_R = 22*mm
 MARGIN_T = 22*mm
 MARGIN_B = 22*mm
 
-FOOTER_TEXT = 'Menzies Leadership Foundation  ·  Fostering Future-Fit Leadership  ·  May 2026'
+FOOTER_TEXT = 'Menzies Leadership Foundation  ·  Fostering Future-Fit Leadership  ·  July 2026'
 
 def draw_footer(canvas, doc):
     canvas.saveState()
@@ -653,7 +653,7 @@ def draw_cover(canvas, doc):
 
 # ── Build the document ────────────────────────────────────────────────────
 def build():
-    out = OUTPUT_DIR / 'MLF-Future-Fit-Leadership-DRAFT.pdf'
+    out = OUTPUT_DIR / 'MLF-Future-Fit-Leadership.pdf'
     doc = BaseDocTemplate(
         str(out), pagesize=A4,
         leftMargin=MARGIN_L, rightMargin=MARGIN_R,
@@ -812,7 +812,7 @@ def build():
         # Emit each inquiry item with roman numerals — continuous across levels
         for item in items:
             story.append(Paragraph(
-                f'<b><font color="#c8963e">{to_roman(roman_counter)}.</font></b>  {item}',
+                f'<b><font color="#00baca">{to_roman(roman_counter)}.</font></b>  {item}',
                 ST_LOI_ITEM))
             roman_counter += 1
         story.append(Spacer(0, 6))
@@ -889,7 +889,7 @@ def build():
     story.append(Paragraph('<a name="sec_workstreams"/>Our Workstreams', ST_H1))
     story.append(GoldRule(48, 2))
     story.append(Spacer(0, 8))
-    for name in ['Innovation', 'Insight', 'Influence']:
+    for name in ['Incubation', 'Insight', 'Influence']:
         el = ELEMENTS.get(name)
         if not el: continue
         lead, header, items = workstream_split(el.get('description', ''))
@@ -1003,13 +1003,13 @@ def build():
     story.append(GoldRule(48, 2))
     story.append(Spacer(0, 12))
     story.append(Paragraph(
-        'The <link href="https://menziesfoundation.org.au" color="#c8963e">Menzies Leadership '
+        'The <link href="https://menziesfoundation.org.au" color="#33c7d6">Menzies Leadership '
         'Foundation</link> works at the intersection of practice, research and culture through '
         'three priorities:', ST_BODY))
     story.append(Spacer(0, 4))
     for txt in [
-        '<b>Innovation</b> — Catalysing partnerships that build leadership capability.',
-        '<b>Insights</b> — Synthesising research and data to advance the field of leadership '
+        '<b>Incubation</b> — Catalysing partnerships that build leadership capability.',
+        '<b>Insight</b> — Synthesising research and data to advance the field of leadership '
         'in complexity.',
         '<b>Influence</b> — Elevating public narratives on leadership, integrity and '
         'collective responsibility.',
@@ -1020,10 +1020,10 @@ def build():
     story.append(Spacer(0, 12))
     story.append(Paragraph(
         'Learn more about future-fit leadership and explore the interactive map at '
-        '<link href="https://menziesfoundation.org.au" color="#c8963e">'
+        '<link href="https://menziesfoundation.org.au" color="#33c7d6">'
         'menziesfoundation.org.au</link>.', ST_BODY))
     story.append(Spacer(0, 40))
-    story.append(Paragraph('Last updated May 2026', ST_NOTE))
+    story.append(Paragraph('Last updated July 2026', ST_NOTE))
 
     doc.build(story)
     print(f'✓ Wrote {out}')
